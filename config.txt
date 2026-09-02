@@ -1,0 +1,17 @@
+# Maze dimensions
+WIDTH=20
+HEIGHT=25
+
+# Maze entry and exit coordinates
+ENTRY=0, 0
+EXIT=14, 19
+
+# Output file
+OUTPUT_FILE=test.txt
+# ¡¡Tener cuidado con los errores de permisos a la hora de crear el archivo!!
+
+# Generate a perfect maze
+PERFECT=True
+
+# Random seed
+SEED=42
