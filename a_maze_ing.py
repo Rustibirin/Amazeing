@@ -34,16 +34,16 @@ def main() -> None:
         )
         sys.exit(1)
 
-    except ValueError as err:
+    except ValueError as e:
         print(
-            f"Configuration error: {err}",
+            f"Configuration error: {e}",
             file=sys.stderr
         )
         sys.exit(1)
 
-    except Exception as err:
+    except Exception as e:
         print(
-            f"An unexpected error occurred: {err}",
+            f"Unexpected error: {e}",
             file=sys.stderr
         )
         sys.exit(1)

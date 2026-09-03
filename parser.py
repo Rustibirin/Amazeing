@@ -23,7 +23,6 @@ def parse_config(file_path: str) -> Dict[str, Any]:
         FileNotFoundError: If the file does not exist.
         ValueError: If there is a syntax error in the file.
     """
-# Permitimos claves duplicadas??
 
     config_data: Dict[str, Any] = {}
 
@@ -47,7 +46,7 @@ def parse_config(file_path: str) -> Dict[str, Any]:
                     f"Error on line {line_num}: Duplicate key found '{key}'."
                 )
 
-            if key in ("WIDTH", "HEIGHT"):
+            if key in ("WIDTH", "HEIGHT", "SEED"):
                 try:
                     config_data[key] = int(val)
                 except ValueError:
@@ -79,16 +78,7 @@ def parse_config(file_path: str) -> Dict[str, Any]:
                         f"Invalid value for PERFECT on line {line_num}: "
                         f"expected 'True' or 'False'."
                     )
-                config_data[key] = val.lower() == "true"
-
-            elif key == "SEED":
-                try:
-                    config_data[key] = int(val)
-                except ValueError:
-                    raise ValueError(
-                        f"Error on line {line_num}: "
-                        f"Invalid value for SEED."
-                    ) from None
+                config_data[key] = (val.lower() == "true")
 
 # ---> Yo mostraría el SEED por pantalla y generaría uno aleatorio
 # si el usuario no lo proporciona, pero tenemos que hablarlo.
@@ -128,25 +118,27 @@ def validate_config(config: Dict[str, Any]) -> None:
 
     width: int = config["WIDTH"]
     height: int = config["HEIGHT"]
-    entry: Tuple[int, int] = config["ENTRY"]
-    exit_node: Tuple[int, int] = config["EXIT"]
+    entry_point: Tuple[int, int] = config["ENTRY"]
+    exit_point: Tuple[int, int] = config["EXIT"]
 
     if width <= 3 or height <= 3:
         raise ValueError(
-            "WIDTH and HEIGHT must be greater than tree."
+            "WIDTH and HEIGHT must be greater than 3."
         )
 
-    if not (0 <= entry[0] < width and 0 <= entry[1] < height):
+    if not (0 <= entry_point[0] < width and 0 <= entry_point[1] < height):
         raise ValueError(
-            f"Entry {entry} is outside the maze boundaries."
+            f"Entry {entry_point} is outside the maze boundaries."
         )
 
-    if not (0 <= exit_node[0] < width and 0 <= exit_node[1] < height):
+    if not (0 <= exit_point[0] < width and 0 <= exit_point[1] < height):
         raise ValueError(
-            f"Exit {exit_node} is outside the maze boundaries."
+            f"Exit {exit_point} is outside the maze boundaries."
         )
 
-    if entry == exit_node:
+    if entry_point == exit_point:
         raise ValueError(
             "Entry and exit cannot be in the same cell."
         )
+# No se está validando nada del OUTPUT_FILE.
+# Hay que darle una vuelta a eso.
