@@ -21,7 +21,7 @@ all: install
 install: $(VENV)/bin/activate
 	@echo "$(BLUE)Installing development tools (flake8, mypy)...$(RESET)"
 	@$(PIP) install --upgrade pip
-	@$(PIP) install flake8 mypy
+	@$(PIP) install flake8 mypy pytest
 	@echo "$(RED)Environment ready. Now you can run $(BLUE)'make run' $(RED)or $(BLUE)'make lint'...$(RESET)"
 
 $(VENV)/bin/activate:
@@ -40,7 +40,7 @@ debug:
 
 .PHONY: clean
 clean:
-	@echo "$(BLUE)Cleaning caches..."
+	@echo "$(BLUE)Cleaning cache files..."
 	@rm -rf __pycache__
 	@rm -rf .mypy_cache
 	@rm -rf .pytest_cache
@@ -70,3 +70,9 @@ lint-strict:
 	@echo "$(BLUE)Running mypy --strict..."
 	@$(VENV)/bin/mypy . --exclude=.venv --strict
 	@echo "$(RED)Code is perfect!$(RESET)"
+
+.PHONY: test
+test:
+	@if [ ! -d "$(VENV)" ]; then make install; fi
+	@echo "$(BLUE)Running unit tests...$(RESET)"
+	@PYTHONPATH=. $(VENV)/bin/pytest tests/ -v
