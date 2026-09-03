@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from parser import parse_config, validate_config
+import configuration
 
 
 def main() -> None:
@@ -17,15 +17,15 @@ def main() -> None:
     config_path: str = sys.argv[1]
 
     try:
-        config = parse_config(config_path)
+        settings = configuration.parse_config(config_path)
 
-        validate_config(config)
+        configuration.validate_config(settings)
 
         print("Configuration loaded and validated successfully!")
-        print(f"Dimensions: {config['WIDTH']}x{config['HEIGHT']}")
-        print(f"Entry: {config['ENTRY']} | Exit: {config['EXIT']}")
-        print(f"Perfect Mode: {config['PERFECT']}")
-        print(f"Output file: {config['OUTPUT_FILE']}")
+        print(f"Dimensions: {settings['WIDTH']}x{settings['HEIGHT']}")
+        print(f"Entry: {settings['ENTRY']} | Exit: {settings['EXIT']}")
+        print(f"Perfect Mode: {settings['PERFECT']}")
+        print(f"Output file: {settings['OUTPUT_FILE']}")
 
     except FileNotFoundError:
         print(
