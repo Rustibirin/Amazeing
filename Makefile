@@ -1,78 +1,74 @@
-
 # Variables
-NAME         = a_maze_ing.py
-CONFIG       = config.txt
-VENV         = .venv
-PYTHON       = $(VENV)/bin/python3
-PIP          = $(VENV)/bin/pip
+NAME    = a_maze_ing.py
+CONFIG  = config.txt
+VENV    = .venv
+PYTHON  = $(VENV)/bin/python3
+PIP     = $(VENV)/bin/pip
 
 # Output colors
-BLUE = \033[1;32m
-RED = \033[1;31m
-YELLOW = \033[1;33m
-RESET = \033[0m
-
+BLUE    = \033[1;34m
+ORANGE  = \033[1;31m
+PURPLE  = \033[1;35m
+GREEN   = \\033[22;38;5;46m
+RESET   = \033[0m
 
 # Rules
 .PHONY: all
 all: install
 
-.PHONY: install
-install: $(VENV)/bin/activate
-	@echo "$(BLUE)Installing development tools (flake8, mypy)...$(RESET)"
-	@$(PIP) install --upgrade pip
-	@$(PIP) install flake8 mypy pytest
-	@echo "$(RED)Environment ready. Now you can run $(BLUE)'make run' $(RED)or $(BLUE)'make lint'...$(RESET)"
-
-$(VENV)/bin/activate:
-	@echo "$(BLUE)Creating Python virtual environment...$(RESET)"
+$(VENV):
+	@echo "$(ORANGE)Creating Python virtual environment...$(GREEN)"
 	@python3 -m venv $(VENV)
+	@echo "$(ORANGE)Installing development tools (flake8, mypy)...$(GREEN)"
+	@$(PIP) install --upgrade pip
+	@$(PIP) install -q -r requirements.txt
+	@echo "$(PURPLE)Environment ready. Now you can run $(BLUE)'make run' $(PURPLE)or $(BLUE)'make lint'...$(RESET)"
+
+.PHONY: install
+install: $(VENV)
 
 .PHONY: run
-run:
-	@if [ ! -d "$(VENV)" ]; then make install; fi
+run: $(VENV)
 	$(PYTHON) $(NAME) $(CONFIG)
 
 .PHONY: debug
-debug:
-	@if [ ! -d "$(VENV)" ]; then make install; fi
+debug: $(VENV)
 	$(PYTHON) -m pdb $(NAME) $(CONFIG)
 
 .PHONY: clean
 clean:
-	@echo "$(BLUE)Cleaning cache files..."
+	@echo "$(ORANGE)Cleaning cache files..."
 	@rm -rf __pycache__
 	@rm -rf .mypy_cache
 	@rm -rf .pytest_cache
 	@rm -rf *.egg-info
 	@rm -rf build dist
-	@echo "$(RED)Cleanup completed.$(RESET)"
+	@echo "$(PURPLE)Cleanup completed.$(RESET)"
 
 .PHONY: fclean
 fclean: clean
 	@rm -rf $(VENV)
-	@echo "$(RED)Virtual environment removed.$(RESET)"
+	@echo "$(ORANGE)Removing virtual environment..."
+	@echo "$(PURPLE)Virtual environment removed.$(RESET)"
 
 .PHONY: lint
-lint:
-	@if [ ! -d "$(VENV)" ]; then make install; fi
-	@echo "$(BLUE)Running flake8..."
+lint: $(VENV)
+	@echo "$(ORANGE)Running flake8..."
 	@$(VENV)/bin/flake8 . --exclude=.venv
-	@echo "$(BLUE)Running mypy..."
-	@$(VENV)/bin/mypy . --exclude=.venv --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
-	@echo "$(RED)Code is clean!$(RESET)"
+	@echo "$(ORANGE)Running mypy..."
+	@$(VENV)/bin/mypy . --exclude=.venv
+	@echo "$(PURPLE)Code is clean!$(RESET)"
 
 .PHONY: lint-strict
-lint-strict:
-	@if [ ! -d "$(VENV)" ]; then make install; fi
-	@echo "$(BLUE)Running flake8..."
+lint-strict: $(VENV)
+	@echo "$(ORANGE)Running flake8..."
 	@$(VENV)/bin/flake8 . --exclude=.venv
-	@echo "$(BLUE)Running mypy --strict..."
+	@echo "$(ORANGE)Running mypy --strict..."
 	@$(VENV)/bin/mypy . --exclude=.venv --strict
-	@echo "$(RED)Code is perfect!$(RESET)"
+	@echo "$(PURPLE)Code is perfect!$(RESET)"
 
 .PHONY: test
-test:
-	@if [ ! -d "$(VENV)" ]; then make install; fi
-	@echo "$(BLUE)Running unit tests...$(RESET)"
+test: $(VENV)
+	@echo "$(ORANGE)Running unit tests...$(GREEN)"
 	@PYTHONPATH=. $(VENV)/bin/pytest tests/ -v
+	@echo "$(PURPLE)Tests completed.$(RESET)"

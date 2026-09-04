@@ -5,6 +5,7 @@ This script receives a configuration file, validates it,
 and prepares the environment for maze generation.
 """
 
+import re
 from typing import Any, Dict, Tuple
 
 
@@ -25,6 +26,7 @@ def parse_config(file_path: str) -> Dict[str, Any]:
     """
 
     config_data: Dict[str, Any] = {}
+    pattern = re.compile(r"^[a-zA-Z0-9._-]+$")
 
     with open(file_path, mode="r", encoding="utf-8") as file:
         for line_num, line in enumerate(file, 1):
@@ -72,6 +74,18 @@ def parse_config(file_path: str) -> Dict[str, Any]:
                     ) from None
                 config_data[key] = (x, y)
 
+            elif key == "OUTPUT_FILE":
+                if (
+                    not val
+                    or len(val.encode('utf-8')) > 255
+                    or not pattern.match(val)
+                ):
+                    raise ValueError(
+                        f"Error on line {line_num}: "
+                        f"Invalid character(s) or length for {key} '{val}'."
+                    )
+                config_data[key] = val
+
             elif key == "PERFECT":
                 if val.lower() not in ("true", "false"):
                     raise ValueError(
@@ -79,9 +93,6 @@ def parse_config(file_path: str) -> Dict[str, Any]:
                         f"expected 'True' or 'False'."
                     )
                 config_data[key] = (val.lower() == "true")
-
-# ---> Yo mostraría el SEED por pantalla y generaría uno aleatorio
-# si el usuario no lo proporciona, pero tenemos que hablarlo.
 
             else:
                 config_data[key] = val
@@ -140,5 +151,3 @@ def validate_config(config: Dict[str, Any]) -> None:
         raise ValueError(
             "Entry and exit cannot be in the same cell."
         )
-# No se está validando nada del OUTPUT_FILE.
-# Hay que darle una vuelta a eso.
