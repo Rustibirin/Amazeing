@@ -111,7 +111,7 @@ def gen_palette() -> list[list[str]]:
 
 def render(settings: dict[str, Any], cont_colors: int,
            solution: list[tuple[int, int]] = []) -> None:
-    print("\033[2J\033[H", end="")
+    print("\033[2J\033[3J\033[H", end="", flush=True)
     width: int = settings['WIDTH']
     height: int = settings['HEIGHT']
     palette: list[list[str]] = gen_palette()
