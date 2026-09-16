@@ -22,16 +22,18 @@ def print_maze(settings: dict[str, Any], maze: list[list[int]],
     for row in range(height):
         print_sqr(colors[0])
         for col in range(width):
-            if (entry_coords == (row, col) or exit_coords == (row, col)):
+            if (maze[row][col] == 15):
+                print_sqr(colors[4])
+            elif (entry_coords == (col, row) or exit_coords == (col, row)):
                 print_sqr(colors[2])
-            elif (sol and (col, row) in sol):
+            elif (sol and (row, col) in sol):
                 print_sqr(colors[3])
             else:
                 print_sqr(colors[1])
             if (maze[row][col] % 4 >= 2):
                 print_sqr(colors[0])
             else:
-                if (sol and (col, row) in sol and (col + 1, row) in sol):
+                if (sol and (row, col) in sol and (row, col + 1) in sol):
                     print_sqr(colors[3])
                 else:
                     print_sqr(colors[1])
@@ -41,7 +43,7 @@ def print_maze(settings: dict[str, Any], maze: list[list[int]],
             if (maze[row][col] % 8 >= 4):
                 print_sqr(colors[0])
             else:
-                if (sol and (col, row) in sol and (col, row + 1) in sol):
+                if (sol and (row, col) in sol and (row + 1, col) in sol):
                     print_sqr(colors[3])
                 else:
                     print_sqr(colors[1])
@@ -75,6 +77,7 @@ def gen_palette() -> list[list[str]]:
     colors.append("\033[38;5;254m\033[48;5;254m \033[0m")
     colors.append("\033[38;5;134m\033[48;5;134m \033[0m")
     colors.append("\033[38;5;207m\033[48;5;207m \033[0m")
+    colors.append("\033[38;5;220m\033[48;5;220m \033[0m")
 
     palette.append(colors)
 
@@ -83,6 +86,7 @@ def gen_palette() -> list[list[str]]:
     colors.append("\033[38;5;230m\033[48;5;230m \033[0m")
     colors.append("\033[38;5;94m\033[48;5;94m \033[0m")
     colors.append("\033[38;5;173m\033[48;5;173m \033[0m")
+    colors.append("\033[38;5;236m\033[48;5;236m \033[0m")
     palette.append(colors)
 
     colors = []
@@ -90,6 +94,7 @@ def gen_palette() -> list[list[str]]:
     colors.append("\033[38;5;194m\033[48;5;194m \033[0m")
     colors.append("\033[38;5;23m\033[48;5;23m \033[0m")
     colors.append("\033[38;5;70m\033[48;5;70m \033[0m")
+    colors.append("\033[38;5;42m\033[48;5;42m \033[0m")
     palette.append(colors)
 
     colors = []
@@ -97,6 +102,7 @@ def gen_palette() -> list[list[str]]:
     colors.append("\033[38;5;219m\033[48;5;219m \033[0m")
     colors.append("\033[38;5;41m\033[48;5;41m \033[0m")
     colors.append("\033[38;5;118m\033[48;5;118m \033[0m")
+    colors.append("\033[38;5;44m\033[48;5;44m \033[0m")
     palette.append(colors)
 
     colors = []
@@ -104,6 +110,7 @@ def gen_palette() -> list[list[str]]:
     colors.append("\033[38;5;123m\033[48;5;123m \033[0m")
     colors.append("\033[38;5;235m\033[48;5;235m \033[0m")
     colors.append("\033[38;5;246m\033[48;5;246m \033[0m")
+    colors.append("\033[38;5;124m\033[48;5;226m \033[0m")
     palette.append(colors)
 
     return (palette)
