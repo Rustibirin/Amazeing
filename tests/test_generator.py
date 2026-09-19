@@ -77,14 +77,11 @@ def test_generator_export_before_steps_raises_runtime_error(
     """Test that exporting before generating or solving raises RuntimeError."""
     generator = MazeGenerator(valid_settings)
 
-    # Lanza excepción si se intenta exportar antes de generar
     with pytest.raises(
         RuntimeError, match="must be generated and solved before exporting"
     ):
         generator.export()
 
-    # Lanza excepción si se intenta exportar
-    # tras generar pero sin haber resuelto
     generator.generate()
     with pytest.raises(
         RuntimeError, match="must be generated and solved before exporting"

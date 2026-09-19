@@ -26,7 +26,6 @@ def test_maze_initialization(default_settings: dict[str, object]) -> None:
     assert len(maze.matrix) == 10
     assert len(maze.matrix[0]) == 10
 
-    # Verify initial wall mask (all 4 walls active = 15)
     for y in range(maze.height):
         for x in range(maze.width):
             if not maze.is_solid(x, y):

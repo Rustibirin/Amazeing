@@ -24,7 +24,6 @@ def test_solver_simple_straight_path(
     maze = Maze(small_maze_settings)
     solver = Solver()
 
-    # Abrir camino horizontal de (0,0) -> (1,0) -> (2,0)
     maze.break_wall(0, 0, Maze.EAST, Maze.WEST, 1, 0)
     maze.break_wall(1, 0, Maze.EAST, Maze.WEST, 2, 0)
 
@@ -39,7 +38,6 @@ def test_solver_unreachable_exit(
     maze = Maze(small_maze_settings)
     solver = Solver()
 
-    # Todas las paredes permanecen cerradas por defecto
     with pytest.raises(
         ValueError, match="No valid path found between ENTRY and EXIT."
     ):
@@ -58,7 +56,6 @@ def test_solver_resets_visited_flags_on_success(
 
     solver.solve(maze)
 
-    # Verificar que ninguna casilla conserva la bandera VISITED
     for y in range(maze.height):
         for x in range(maze.width):
             assert maze.is_visited(x, y) is False
@@ -74,7 +71,6 @@ def test_solver_resets_visited_flags_on_failure(
     with pytest.raises(ValueError):
         solver.solve(maze)
 
-    # El bloque finally debe haber limpiado las banderas igualmente
     for y in range(maze.height):
         for x in range(maze.width):
             assert maze.is_visited(x, y) is False
@@ -87,8 +83,6 @@ def test_solver_ignores_solid_cells(
     maze = Maze(small_maze_settings)
     solver = Solver()
 
-    # Crear dos rutas: una superior (0,0)->(0,1)->(0,2)
-    # y marcar (0,1) como SOLID
     maze.break_wall(0, 0, Maze.SOUTH, Maze.NORTH, 0, 1)
     maze.mark_solid(0, 1)
 

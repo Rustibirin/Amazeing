@@ -17,8 +17,7 @@ def maze_setup() -> Maze:
         "PERFECT": True,
     }
     maze = Maze(settings)
-    # Romper pared este en (0,0) -> (1,0) para
-    # cambiar la máscara de 15 (F) a 13 (D)
+
     maze.break_wall(0, 0, Maze.EAST, Maze.WEST, 1, 0)
     return maze
 
@@ -35,14 +34,10 @@ def test_exporter_file_structure_and_content(
     assert output_file.exists()
     lines = output_file.read_text(encoding="utf-8").splitlines()
 
-    # Estructura esperada: 3 filas de grid + 1 línea en
-    # blanco + entrada + salida + solución
     assert len(lines) == 7
 
-    # Verificar que la línea en blanco esté en la posición exacta
     assert lines[3] == ""
 
-    # Verificar coordenadas de entrada, salida y ruta de solución
     assert lines[4] == "0,0"
     assert lines[5] == "2,2"
     assert lines[6] == "EESS"
@@ -61,12 +56,8 @@ def test_exporter_hex_formatting(
     lines = output_file.read_text(encoding="utf-8").splitlines()
     first_row = lines[0]
 
-    # Cada fila debe tener tantos caracteres
-    # hexadecimales como la anchura del laberinto
     assert len(first_row) == 3
 
-    # (0,0) perdió la pared ESTE (2), pasa de 15 (F) a 13 (D)
-    # (1,0) perdió la pared OESTE (8), pasa de 15 (F) a 7 (7)
     assert first_row[0] == "D"
     assert first_row[1] == "7"
     assert first_row[2] == "F"
