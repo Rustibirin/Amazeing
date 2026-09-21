@@ -52,7 +52,7 @@ The program reads a plain text configuration file using a strict KEY=VALUE forma
 | `OUTPUT_FILE`            | String  | Name of the exported hex text file.                                   | `OUTPUT_FILE=maze.txt` |
 | `PERFECT`                | Boolean | `True` for a single-path maze, `False` for Pac-Man mode.              | `PERFECT=True`         |
 | `SEED` *(Optional)*      | Integer | Ensures deterministic procedural generation.                          | `SEED=42`              |
-| `GAME_MODE` *(Optional)* | String  | Dead-end removal aggressiveness (`Easy`, `Medium`, `Hard`, `Insane`). | `GAME_MODE=Easy`       |
+| `GAME_MODE` *(Optional)* | String  | Dead-end removal (`Bonus`, `Easy`, `Medium`, `Hard`, `Insane`).       | `GAME_MODE=Easy`       |
 | `DELAY` *(Optional)*     | Float   | Delay in seconds for live terminal rendering.                         | `DELAY=0.05`           |
 
 ### Maze Generation Algorithm

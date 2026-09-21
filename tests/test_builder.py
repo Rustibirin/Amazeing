@@ -59,7 +59,7 @@ def test_pacman_mode_modifies_walls(
 
     builder_perfect.build(maze_perfect, perfect=True, delay=0.0)
     builder_imperfect.build(
-        maze_imperfect, perfect=False, delay=0.0, game_mode=0.8
+        maze_imperfect, perfect=False, delay=0.0, game_mode=1.0
     )
 
     assert maze_perfect.matrix != maze_imperfect.matrix

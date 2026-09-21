@@ -5,8 +5,8 @@ from typing import Any
 WALL_COLOR: str = "\033[1;33m█\033[0m"
 PATH_COLOR: str = "\033[1;92m█\033[0m"
 TEMPLATE_COLOR: str = "\033[32m█\033[0m"
-ENTRY_COLOR: str = "\033[92mS\033[0m"
-EXIT_COLOR: str = "\033[91mE\033[0m"
+ENTRY_COLOR: str = "\033[91m█\033[0m"
+EXIT_COLOR: str = "\033[91m█\033[0m"
 SPACE: str = " "
 
 COLOR_PALETTES = [

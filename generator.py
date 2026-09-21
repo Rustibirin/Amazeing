@@ -5,6 +5,7 @@ from maze import Maze
 from builder import Builder
 from solver import Solver
 from exporter import Exporter
+from configuration import GameMode
 
 
 class MazeGenerator:
@@ -36,7 +37,7 @@ class MazeGenerator:
             self.maze,
             perfect=self.settings["PERFECT"],
             delay=delay,
-            game_mode=self.settings.get("GAME_MODE", 1),
+            game_mode=self.settings.get("GAME_MODE", GameMode.BONUS).value,
             animation=animation,
         )
         return self.maze

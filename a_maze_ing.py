@@ -7,6 +7,15 @@ from typing import Any
 import configuration
 from generator import MazeGenerator
 import visualizer
+from configuration import GameMode
+
+
+def toggle_game_mode(settings: dict[str, Any]) -> None:
+    """Cycles through the available GameModes in the settings."""
+    modes = list(GameMode)
+    current_mode = settings.get("GAME_MODE", GameMode.BONUS)
+    next_index = (modes.index(current_mode) + 1) % len(modes)
+    settings["GAME_MODE"] = modes[next_index]
 
 
 def run_pipeline(
@@ -52,24 +61,39 @@ def run_menu(
         if grid.maze:
             current_path = solution if show_path else ""
             visualizer.render_ascii(grid.maze, current_path)
-            if not grid.maze.has_42:
+            if grid.maze.small_grid:
                 print(
                     "Warning: Maze dimensions are too "
-                    "small to embed the '42' pattern."
+                    "small to stamp the '42' pattern."
                 )
+            else:
+                if not grid.maze.has_42:
+                    print(
+                        "Warning: The ENTRY or EXIT overlaps with "
+                        "the '42' pattern. Cannot stamp it"
+                    )
+
             if grid.maze.easter_egg:
                 print("You found the Easter Egg. Congratulations!!")
             print(f"Live Mode: {settings.get('LIVE_MODE', False)}")
+            print(f"Perfect Mode: {settings['PERFECT']}")
+            if not settings["PERFECT"]:
+                print(
+                    f"Game Mode: "
+                    f"{settings.get('GAME_MODE',GameMode.BONUS).name}"
+                )
 
         print("\n=== A-Maze-ing ===")
         print("1. Re-generate a new maze")
         print("2. Show/Hide the shortest path")
         print("3. Rotate wall colours")
         print("4. Toggle Live Animation")
-        print("5. Quit")
+        print("5. Toggle Perfect Mode")
+        print("6. Toggle Game Mode")
+        print("7. Quit")
 
         try:
-            choice = input("Choice? (1-5): ").strip()
+            choice = input("Choice? (1-7): ").strip()
         except (KeyboardInterrupt, EOFError):
             print("\nExiting program...")
             break
@@ -95,6 +119,12 @@ def run_menu(
             settings["LIVE_MODE"] = not settings.get("LIVE_MODE", False)
 
         elif choice == "5":
+            settings["PERFECT"] = not settings["PERFECT"]
+
+        elif choice == "6":
+            toggle_game_mode(settings)
+
+        elif choice == "7":
             print("Goodbye!")
             break
 

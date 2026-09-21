@@ -15,7 +15,6 @@ class Maze:
     IN_MAZE = 16
     SOLID = 32
     VISITED = 64
-    SIGNED = 128
 
     ALL_WALLS_MASK = NORTH | EAST | SOUTH | WEST
 
@@ -36,6 +35,7 @@ class Maze:
         self.exit: tuple[int, int] = settings["EXIT"]
 
         self.matrix: list[list[int]] = self._build_initial_matrix()
+        self.small_grid: bool = False
         self.has_42: bool = False
         self.easter_egg: bool = False
         self._apply_templates()
@@ -65,12 +65,6 @@ class Maze:
 
     def mark_solid(self, x: int, y: int) -> None:
         self.matrix[y][x] |= self.SOLID
-
-    def is_signed(self, x: int, y: int) -> bool:
-        return bool(self.matrix[y][x] & self.SIGNED)
-
-    def mark_signed(self, x: int, y: int) -> None:
-        self.matrix[y][x] |= self.SIGNED
 
     def is_visited(self, x: int, y: int) -> bool:
         return bool(self.matrix[y][x] & self.VISITED)
@@ -108,19 +102,6 @@ class Maze:
         ):
             self._break_partition(next_x, next_y, opp_bit)
 
-    def can_stamp_symbol(self, symbol: list[list[int]]) -> bool:
-        if not symbol or not symbol[0]:
-            return False
-
-        symbol_width = len(symbol[0])
-        symbol_height = len(symbol)
-
-        margin = 2
-        required_width = symbol_width + margin
-        required_height = symbol_height + margin
-
-        return self.width >= required_width and self.height >= required_height
-
     def _get_center(self, symbol: list[list[int]]) -> tuple[int, int]:
         symbol_height = len(symbol)
         symbol_width = len(symbol[0])
@@ -151,50 +132,77 @@ class Maze:
             return self._get_bottom_right(symbol)
         return self._get_center(symbol)
 
-    def _apply_templates(self) -> None:
-        symbol_42 = TEMPLATES.get("42_symbol")
-        if symbol_42 and self.can_stamp_symbol(symbol_42):
-            self.embed_symbol(symbol_42, position="center")
-            self.has_42 = True
+    def can_stamp_symbol(
+            self,
+            symbol: list[list[int]],
+            position: str = "center",
+    ) -> bool:
+        """Checks if the maze is large enough and has no collisions."""
+        if not symbol or not symbol[0]:
+            return False
 
-        if self.width >= 170 and self.height >= 30:
-            jaime_user = TEMPLATES.get("jaime_user")
-            ruben_user = TEMPLATES.get("ruben_user")
-            self.easter_egg = True
-
-            if jaime_user and self.can_stamp_symbol(jaime_user):
-                self.embed_symbol(jaime_user, position="bottom_left")
-
-            if ruben_user and self.can_stamp_symbol(ruben_user):
-                self.embed_symbol(ruben_user, position="bottom_right")
-
-    def embed_symbol(
-        self, symbol: list[list[int]], position: str = "center"
-    ) -> None:
-        """Stamps a symbol matrix by activating the SOLID flag (32)."""
-        match = True
-        for name, template_value in TEMPLATES.items():
-            for i in range(len(symbol)):
-                for j in range(len(symbol[i])):
-                    if symbol[i][j] != template_value[i][j]:
-                        match = False
-
-        symbol_height = len(symbol)
         symbol_width = len(symbol[0])
+        symbol_height = len(symbol)
+        margin = 2
+
+        if (
+            self.width < symbol_width + margin or
+            self.height < symbol_height + margin
+        ):
+            self.small_grid = True
+            return False
+
         start_x, start_y = self._get_position_coords(symbol, position)
 
-        for symbol_y in range(symbol_height):
-            for symbol_x in range(symbol_width):
-                if symbol[symbol_y][symbol_x] == 1:
+        for symbol_y, row in enumerate(symbol):
+            for symbol_x, val in enumerate(row):
+                if val == 1:
                     target_x = start_x + symbol_x
                     target_y = start_y + symbol_y
 
                     if (target_x, target_y) in (self.entry, self.exit):
-                        raise ValueError(
-                            "The ENTRY or EXIT overlaps "
-                            "with the embedded symbol."
-                        )
-                    if match:
-                        self.mark_solid(target_x, target_y)
-                    else:
-                        self.mark_signed(target_x, target_y)
+                        return False
+        return True
+
+    def _apply_templates(self) -> None:
+        """Attempts to embed the 42 symbol and developer easter eggs."""
+        symbol_42 = TEMPLATES.get("42_symbol")
+        if symbol_42:
+            self.has_42 = self.embed_symbol(symbol_42, position="center")
+
+        if self.width >= 90 and self.height >= 30:
+            jaime_user = TEMPLATES.get("jaime_user")
+            ruben_user = TEMPLATES.get("ruben_user")
+
+            jaime_stamp = False
+            ruben_stamp = False
+
+            if jaime_user:
+                jaime_stamp = self.embed_symbol(
+                    jaime_user,
+                    position="bottom_left"
+                )
+
+            if ruben_user:
+                ruben_stamp = self.embed_symbol(
+                    ruben_user,
+                    position="bottom_right"
+                )
+
+            self.easter_egg = jaime_stamp or ruben_stamp
+
+    def embed_symbol(
+        self, symbol: list[list[int]], position: str = "center"
+    ) -> bool:
+        """Stamp a symbol if validation passes. Returns success."""
+        if not self.can_stamp_symbol(symbol, position):
+            return False
+
+        start_x, start_y = self._get_position_coords(symbol, position)
+
+        for symbol_y, row in enumerate(symbol):
+            for symbol_x, val in enumerate(row):
+                if val == 1:
+                    self.mark_solid(start_x + symbol_x, start_y + symbol_y)
+
+        return True

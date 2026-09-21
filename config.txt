@@ -4,7 +4,7 @@ HEIGHT=10
 
 # Maze entry and exit coordinates
 ENTRY=0, 2
-EXIT=4, 4
+EXIT=5, 4
 
 # Output file
 OUTPUT_FILE=maze.txt
@@ -16,4 +16,4 @@ PERFECT=False
 # Optionals
 SEED=42
 #GAME_MODE=easy
-DELAY=0.02
+DELAY=0.1

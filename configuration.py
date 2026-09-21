@@ -13,6 +13,7 @@ from enum import Enum
 class GameMode(float, Enum):
     """Maze difficulty levels mapped to dead-end removal rates."""
 
+    BONUS = 1.0
     EASY = 0.8
     MEDIUM = 0.5
     HARD = 0.3
@@ -110,7 +111,7 @@ def parse_config(file_path: str) -> dict[str, Any]:
                         f"Invalid value for GAME_MODE on line {line_num}: "
                         f"expected 'Easy', 'Medium', 'Hard' or 'Insane'."
                     )
-                config_data[key] = GameMode[val.upper()].value
+                config_data[key] = GameMode[val.upper()]
 
             elif key == "DELAY":
                 try:
