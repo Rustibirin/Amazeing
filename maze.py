@@ -15,6 +15,7 @@ class Maze:
     IN_MAZE = 16
     SOLID = 32
     VISITED = 64
+    SIGNED = 128
 
     ALL_WALLS_MASK = NORTH | EAST | SOUTH | WEST
 
@@ -64,6 +65,12 @@ class Maze:
 
     def mark_solid(self, x: int, y: int) -> None:
         self.matrix[y][x] |= self.SOLID
+
+    def is_signed(self, x: int, y: int) -> bool:
+        return bool(self.matrix[y][x] & self.SIGNED)
+
+    def mark_signed(self, x: int, y: int) -> None:
+        self.matrix[y][x] |= self.SIGNED
 
     def is_visited(self, x: int, y: int) -> bool:
         return bool(self.matrix[y][x] & self.VISITED)
@@ -165,6 +172,13 @@ class Maze:
         self, symbol: list[list[int]], position: str = "center"
     ) -> None:
         """Stamps a symbol matrix by activating the SOLID flag (32)."""
+        match = True
+        for name, template_value in TEMPLATES.items():
+            for i in range(len(symbol)):
+                for j in range(len(symbol[i])):
+                    if symbol[i][j] != template_value[i][j]:
+                        match = False
+
         symbol_height = len(symbol)
         symbol_width = len(symbol[0])
         start_x, start_y = self._get_position_coords(symbol, position)
@@ -180,5 +194,7 @@ class Maze:
                             "The ENTRY or EXIT overlaps "
                             "with the embedded symbol."
                         )
-
-                    self.mark_solid(target_x, target_y)
+                    if match:
+                        self.mark_solid(target_x, target_y)
+                    else:
+                        self.mark_signed(target_x, target_y)
