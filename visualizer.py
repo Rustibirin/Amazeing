@@ -67,7 +67,9 @@ def _draw_grid(grid: list[list[str]]) -> None:
     """Clears screen and prints the character canvas to the terminal."""
     print("\033[H\033[J", end="")
     for row in grid:
-        print("".join(row))
+        for elm in row:
+            print(elm * 2, end="")
+        print()
 
 
 def render_live(maze: Any, delay: float) -> None:
