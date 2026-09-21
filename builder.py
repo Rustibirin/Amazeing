@@ -25,7 +25,7 @@ class Builder:
         maze: Any,
         perfect: bool,
         delay: float,
-        game_mode: float = 0.8,
+        game_mode: float = 1,
         animation: Callable[[Any, float], None] | None = None,
     ) -> None:
         """Executes the maze generation pipeline."""

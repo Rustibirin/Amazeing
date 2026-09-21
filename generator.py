@@ -36,7 +36,7 @@ class MazeGenerator:
             self.maze,
             perfect=self.settings["PERFECT"],
             delay=delay,
-            game_mode=self.settings.get("GAME_MODE", 0.8),
+            game_mode=self.settings.get("GAME_MODE", 1),
             animation=animation,
         )
         return self.maze
