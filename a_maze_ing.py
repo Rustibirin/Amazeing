@@ -32,20 +32,24 @@ def run_pipeline(
     live = None
     if settings.get("LIVE_MODE"):
         live = visualizer.render_live
-
-    grid.generate(
-        animation=live,
-        delay=settings.get("DELAY", 0.0),
-    )
-    solution = grid.solve()
-    grid.export()
-
-    if settings.get("LIVE_MODE") and grid.maze and show_path:
-        visualizer.animate_solution(
-            grid.maze,
-            solution,
+    try:
+        grid.generate(
+            animation=live,
             delay=settings.get("DELAY", 0.0),
         )
+        solution = grid.solve()
+        grid.export()
+
+        if settings.get("LIVE_MODE") and grid.maze and show_path:
+            visualizer.animate_solution(
+                grid.maze,
+                solution,
+                delay=settings.get("DELAY", 0.0),
+            )
+    except KeyboardInterrupt:
+        solution = grid.solve()
+        grid.export()
+        visualizer.render_ascii(grid.maze, solution)
 
     return solution
 
@@ -54,10 +58,11 @@ def run_menu(
     grid: MazeGenerator,
     settings: dict[str, Any],
     solution: str,
+    config_path: str
 ) -> None:
     """Handles the interactive terminal menu loop."""
-    show_path: bool = True
-
+    show_path: bool = False
+    base_settings: dict = settings.copy()
     while True:
         if grid.maze:
             current_path = solution if show_path else ""
@@ -92,11 +97,12 @@ def run_menu(
         print("4. Toggle Live Animation")
         print("5. Toggle Perfect Mode")
         print("6. Toggle Game Mode")
-        print("7. PLAY MAZE!")
-        print("8. Quit")
+        print("7. Charge new settings")
+        print("8. PLAY MAZE!")
+        print("9. Quit")
 
         try:
-            choice = input("Choice? (1-8): ").strip()
+            choice = input("Choice? (1-9): ").strip()
         except (KeyboardInterrupt, EOFError):
             print("\nExiting program...")
             break
@@ -108,11 +114,15 @@ def run_menu(
 
         elif choice == "2":
             if settings.get("LIVE_MODE") and grid.maze and not show_path:
-                visualizer.animate_solution(
-                    grid.maze,
-                    solution,
-                    delay=settings.get("DELAY", 0.00),
-                )
+                try:
+                    visualizer.animate_solution(
+                        grid.maze,
+                        solution,
+                        delay=settings.get("DELAY", 0.00),
+                    )
+                except KeyboardInterrupt:
+                    settings['LIVE_MODE'] = False
+                    visualizer.render_ascii(grid.maze, solution)
             show_path = not show_path
 
         elif choice == "3":
@@ -126,19 +136,38 @@ def run_menu(
 
         elif choice == "6":
             toggle_game_mode(settings)
-
+        
         elif choice == "7":
+            try:
+                new_settings = load_settings(config_path)
+                if (new_settings == base_settings):
+                    raise FileNotFoundError
+                settings = new_settings
+                print("Re-generating maze...")
+                settings.pop("SEED", None)
+                grid = MazeGenerator(settings)
+                solution = run_pipeline(grid, settings, show_path)
+            except Exception:
+                print("No more changes to reflect")
+                sleep(1)
+
+        elif choice == "8":
             if grid.maze:
                 game_mode.play_interactive(grid.maze)
 
-        elif choice == "8":
+        elif choice == "9":
             print("Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please select an option from 1 to 8.")
+            print("Invalid choice. Please select an option from 1 to 9.")
             sleep(1)
 
+
+def load_settings(config_path: str) -> dict[str, Any]:
+    settings = configuration.parse_config(config_path)
+    configuration.validate_config(settings)
+    return (settings)
 
 def main() -> None:
     """Program entry point."""
@@ -151,12 +180,11 @@ def main() -> None:
 
     config_path: str = sys.argv[1]
 
+    
+    print("\033c", end="")
+    print("Validating configuration...")
     try:
-        print("\033[H\033[J", end="")
-        print("Validating configuration...")
-        settings = configuration.parse_config(config_path)
-
-        configuration.validate_config(settings)
+        settings = load_settings(config_path)   
 
         print()
         print("Configuration loaded and validated successfully!")
@@ -172,7 +200,7 @@ def main() -> None:
 
         grid = MazeGenerator(settings)
         solution = run_pipeline(grid, settings)
-        run_menu(grid, settings, solution)
+        run_menu(grid, settings, solution, config_path)
 
     except FileNotFoundError:
         print(
@@ -187,6 +215,8 @@ def main() -> None:
             file=sys.stderr
         )
         sys.exit(1)
+    except KeyboardInterrupt:
+        print("\nExiting the program.")
 
     except Exception as e:
         print(

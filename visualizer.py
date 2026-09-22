@@ -6,35 +6,34 @@ WALL_COLOR: int = 0
 PATH_COLOR: int = 1
 ENT_EX_COLOR: int = 2
 SOLUTION_COLOR: int = 3
-TEMPLATES_COLOR: int = 4
-PLAYER_COLOR: int = 5
+TEMPLATE_COLOR: int = 4
 PALETTE: tuple[str] = ("", "", "", "", "")
 
 COLOR_PALETTES = [
     ("\033[38;5;16m\033[48;5;16m \033[0m",
-     "\033[38;5;207m\033[48;5;207m \033[0m",
-     "\033[38;5;134m\033[48;5;134m \033[0m",
      "\033[38;5;254m\033[48;5;254m \033[0m",
+     "\033[38;5;134m\033[48;5;134m \033[0m",
+     "\033[38;5;207m\033[48;5;207m \033[0m",
      "\033[38;5;220m\033[48;5;220m \033[0m"),
     ("\033[38;5;38m\033[48;5;38m \033[0m",
-     "\033[38;5;173m\033[48;5;173m \033[0m",
-     "\033[38;5;94m\033[48;5;94m \033[0m",
      "\033[38;5;230m\033[48;5;230m \033[0m",
+     "\033[38;5;94m\033[48;5;94m \033[0m",
+     "\033[38;5;173m\033[48;5;173m \033[0m",
      "\033[38;5;236m\033[48;5;236m \033[0m"),
     ("\033[38;5;204m\033[48;5;204m \033[0m",
-     "\033[38;5;70m\033[48;5;70m \033[0m",
-     "\033[38;5;23m\033[48;5;23m \033[0m",
      "\033[38;5;194m\033[48;5;194m \033[0m",
+     "\033[38;5;23m\033[48;5;23m \033[0m",
+     "\033[38;5;70m\033[48;5;70m \033[0m",
      "\033[38;5;42m\033[48;5;42m \033[0m"),
     ("\033[38;5;160m\033[48;5;160m \033[0m",
-     "\033[38;5;118m\033[48;5;118m \033[0m",
-     "\033[38;5;41m\033[48;5;41m \033[0m",
      "\033[38;5;219m\033[48;5;219m \033[0m",
+     "\033[38;5;41m\033[48;5;41m \033[0m",
+     "\033[38;5;118m\033[48;5;118m \033[0m",
      "\033[38;5;44m\033[48;5;44m \033[0m"),
     ("\033[38;5;128m\033[48;5;128m \033[0m",
-     "\033[38;5;246m\033[48;5;246m \033[0m",
-     "\033[38;5;235m\033[48;5;235m \033[0m",
      "\033[38;5;123m\033[48;5;123m \033[0m",
+     "\033[38;5;235m\033[48;5;235m \033[0m",
+     "\033[38;5;246m\033[48;5;246m \033[0m",
      "\033[38;5;124m\033[48;5;226m \033[0m"),
 ]
 current_palette_idx = 0
@@ -79,11 +78,11 @@ def _build_base_grid(maze: Any) -> list[list[str]]:
                 continue
 
             if maze.in_maze(x, y):
-                grid[grid_y][grid_x] = PALETTE[SOLUTION_COLOR]
+                grid[grid_y][grid_x] = PALETTE[PATH_COLOR]
                 val = maze.matrix[y][x]
                 for move_x, move_y, bit, _ in maze.DIR_MAP.values():
                     if not (val & bit):
-                        grid[grid_y + move_y][grid_x + move_x] = PALETTE[SOLUTION_COLOR]
+                        grid[grid_y + move_y][grid_x + move_x] = PALETTE[PATH_COLOR]
 
     _stamp_start_and_exit(grid, maze)
     return grid
@@ -102,6 +101,7 @@ def render_live(maze: Any, delay: float) -> None:
     """Renders only the current state of maze generation in real-time."""
     grid = _build_base_grid(maze)
     _draw_grid(grid)
+    print("Press Ctrl + C to interrupt the animation")
     if delay > 0:
         time.sleep(delay)
 
@@ -115,17 +115,19 @@ def animate_solution(maze: Any, solution: str, delay: float) -> None:
         grid_y, grid_x = current_y * 2 + 1, current_x * 2 + 1
 
         if (current_x, current_y) != maze.entry:
-            grid[grid_y][grid_x] = PALETTE[PATH_COLOR]
+            grid[grid_y][grid_x] = PALETTE[SOLUTION_COLOR]
 
         move_x, move_y, _, _ = maze.DIR_MAP[step]
-        grid[grid_y + move_y][grid_x + move_x] = PALETTE[PATH_COLOR]
+        grid[grid_y + move_y][grid_x + move_x] = PALETTE[SOLUTION_COLOR]
 
         current_x += move_x
         current_y += move_y
 
         _draw_grid(grid)
+        print("Press Ctrl + C to interrupt the animation")
         if delay > 0:
-            time.sleep(delay)
+            time.sleep(delay)    
+
 
     _stamp_start_and_exit(grid, maze)
     _draw_grid(grid)
@@ -144,14 +146,14 @@ def render_ascii(maze: Any, solution: str = "") -> None:
         current_x, current_y = maze.entry
         for step in solution:
             grid_y, grid_x = current_y * 2 + 1, current_x * 2 + 1
-            grid[grid_y][grid_x] = PALETTE[PATH_COLOR]
+            grid[grid_y][grid_x] = PALETTE[SOLUTION_COLOR]
             move_x, move_y, _, _ = maze.DIR_MAP[step]
-            grid[grid_y + move_y][grid_x + move_x] = PALETTE[PATH_COLOR]
+            grid[grid_y + move_y][grid_x + move_x] = PALETTE[SOLUTION_COLOR]
 
             current_x += move_x
             current_y += move_y
 
-        grid[current_y * 2 + 1][current_x * 2 + 1] = PALETTE[PATH_COLOR]
+        grid[current_y * 2 + 1][current_x * 2 + 1] = PALETTE[SOLUTION_COLOR]
 
         _stamp_start_and_exit(grid, maze)
 
@@ -167,6 +169,6 @@ def render_playable(maze: Any, player_x: int, player_y: int) -> None:
     grid_y = player_y * 2 + 1
     grid_x = player_x * 2 + 1
 
-    grid[grid_y][grid_x] = PLAYER_COLOR
+    grid[grid_y][grid_x] = PALETTE[SOLUTION_COLOR]
 
     _draw_grid(grid)

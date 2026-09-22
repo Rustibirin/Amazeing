@@ -25,7 +25,7 @@ class MazeGenerator:
         self,
         animation: Callable[[Any, float], None] | None = None,
         delay: float = 0.0,
-    ) -> Maze:
+    ) -> (Maze, bool):
         """Generates the maze structure using the configured parameters.
 
         Returns:
@@ -33,14 +33,29 @@ class MazeGenerator:
         """
         self.maze = Maze(self.settings)
         builder = Builder(seed=self.settings.get("SEED"))
-        builder.build(
-            self.maze,
-            perfect=self.settings["PERFECT"],
-            delay=delay,
-            game_mode=self.settings.get("GAME_MODE", GameMode.BONUS).value,
-            animation=animation,
-        )
-        return self.maze
+        try:
+            builder.build(
+                self.maze,
+                perfect=self.settings["PERFECT"],
+                delay=delay,
+                game_mode=self.settings.get("GAME_MODE", GameMode.BONUS).value,
+                animation=animation,
+                start_cell=self.settings.get('ENTRY'),
+                exit_cell=self.settings.get('EXIT')
+            )
+        except KeyboardInterrupt:
+            animation = False
+            builder.build(
+                self.maze,
+                perfect=self.settings["PERFECT"],
+                delay=delay,
+                game_mode=self.settings.get("GAME_MODE", GameMode.BONUS).value,
+                animation=animation,
+                start_cell=self.settings.get('ENTRY'),
+                exit_cell=self.settings.get('EXIT')
+            )
+            raise KeyboardInterrupt
+        return (self.maze, animation)
 
     def solve(self) -> str:
         """Calculates the shortest path solution from entry to exit.

@@ -27,9 +27,12 @@ class Builder:
         delay: float,
         game_mode: float = 1,
         animation: Callable[[Any, float], None] | None = None,
+        start_cell: tuple[int, int] = (0, 0),
+        exit_cell: tuple[int, int] = (1, 1)
     ) -> None:
         """Executes the maze generation pipeline."""
-        self._create_perfect_maze(maze, animation, delay)
+        self._create_perfect_maze(maze, animation, delay, 
+                                  start_cell, exit_cell)
 
         if not perfect:
             self._pacman_mode(maze, delay, game_mode, animation)
@@ -39,6 +42,8 @@ class Builder:
         maze: Any,
         animation: Callable[[Any, float], None] | None,
         delay: float,
+        start_cell: tuple[int, int],
+        exit_cell: tuple[int, int]
     ) -> None:
         valid_grid: list[Tuple[int, int]] = [
             (x, y)
@@ -50,7 +55,8 @@ class Builder:
         if not valid_grid:
             return
 
-        start_cell = random.choice(valid_grid)
+        force_exit_start = True if exit_cell in valid_grid else False
+        
         maze.mark_in_maze(start_cell[0], start_cell[1])
         cells_in_maze = 1
         total_valid = len(valid_grid)
@@ -65,7 +71,12 @@ class Builder:
             if not unvisited:
                 break
 
-            walk_start = random.choice(unvisited)
+            if force_exit_start and exit_cell in unvisited:
+                walk_start = exit_cell
+                force_exit_start = False
+            else:
+                walk_start = random.choice(unvisited)
+                
             current = walk_start
 
             walk: Dict[Tuple[int, int], Tuple[Tuple[int, int], int, int]] = {}
