@@ -198,6 +198,7 @@ def main() -> None:
 
         print()
         input("\nPress Enter to continue...")
+        print("\033[0H\033[0J")
 
         grid = MazeGenerator(settings)
         solution = run_pipeline(grid, settings)

@@ -115,7 +115,6 @@ def render_live(maze: Any, delay: float) -> None:
     """Renders only the current state of maze generation in real-time."""
     grid = _build_base_grid(maze)
     _draw_grid(grid)
-    print("Press Ctrl + C to interrupt the animation")
     if delay > 0:
         time.sleep(delay)
 
@@ -138,7 +137,6 @@ def animate_solution(maze: Any, solution: str, delay: float) -> None:
         current_y += move_y
 
         _draw_grid(grid)
-        print("Press Ctrl + C to interrupt the animation")
         if delay > 0:
             time.sleep(delay)
 
