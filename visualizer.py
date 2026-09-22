@@ -62,7 +62,7 @@ def _build_base_grid(maze: Any) -> list[list[str]]:
     """
     grid_h = maze.height * 2 + 1
     grid_w = maze.width * 2 + 1
-    grid = [[PALETTE[WALL_COLOR] 
+    grid = [[PALETTE[WALL_COLOR]
              for _ in range(grid_w)] for _ in range(grid_h)]
 
     for y in range(maze.height):
@@ -130,7 +130,7 @@ def animate_solution(maze: Any, solution: str, delay: float) -> None:
         _draw_grid(grid)
         print("Press Ctrl + C to interrupt the animation")
         if delay > 0:
-            time.sleep(delay)    
+            time.sleep(delay)
 
     _stamp_start_and_exit(grid, maze)
     _draw_grid(grid)
