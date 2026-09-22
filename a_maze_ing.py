@@ -142,6 +142,7 @@ def run_menu(
                 new_settings = load_settings(config_path)
                 if (new_settings == base_settings):
                     raise FileNotFoundError
+                print("\033[0H\033[0J")
                 settings = new_settings
                 print("Re-generating maze...")
                 settings.pop("SEED", None)

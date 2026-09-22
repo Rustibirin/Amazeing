@@ -4,34 +4,40 @@ from typing import Any
 # ANSI terminal colors
 WALL_COLOR: int = 0
 PATH_COLOR: int = 1
-ENT_EX_COLOR: int = 2
-SOLUTION_COLOR: int = 3
-TEMPLATE_COLOR: int = 4
+ENT_COLOR: int = 2
+EXT_COLOR: int = 3
+SOLUTION_COLOR: int = 4
+TEMPLATE_COLOR: int = 5
 PALETTE: tuple[str, str, str, str, str] = ("", "", "", "", "")
 
 COLOR_PALETTES = [
     ("\033[38;5;16m\033[48;5;16m \033[0m",
      "\033[38;5;254m\033[48;5;254m \033[0m",
+     "\033[38;5;124m\033[48;5;124m \033[0m",
      "\033[38;5;134m\033[48;5;134m \033[0m",
      "\033[38;5;207m\033[48;5;207m \033[0m",
      "\033[38;5;220m\033[48;5;220m \033[0m"),
     ("\033[38;5;38m\033[48;5;38m \033[0m",
      "\033[38;5;230m\033[48;5;230m \033[0m",
+     "\033[38;5;134m\033[48;5;134m \033[0m",
      "\033[38;5;94m\033[48;5;94m \033[0m",
      "\033[38;5;173m\033[48;5;173m \033[0m",
      "\033[38;5;236m\033[48;5;236m \033[0m"),
     ("\033[38;5;204m\033[48;5;204m \033[0m",
      "\033[38;5;194m\033[48;5;194m \033[0m",
+     "\033[38;5;137m\033[48;5;137m \033[0m",
      "\033[38;5;23m\033[48;5;23m \033[0m",
      "\033[38;5;70m\033[48;5;70m \033[0m",
      "\033[38;5;42m\033[48;5;42m \033[0m"),
     ("\033[38;5;160m\033[48;5;160m \033[0m",
      "\033[38;5;219m\033[48;5;219m \033[0m",
+     "\033[38;5;58m\033[48;5;58m \033[0m",
      "\033[38;5;41m\033[48;5;41m \033[0m",
      "\033[38;5;118m\033[48;5;118m \033[0m",
      "\033[38;5;44m\033[48;5;44m \033[0m"),
     ("\033[38;5;128m\033[48;5;128m \033[0m",
      "\033[38;5;123m\033[48;5;123m \033[0m",
+     "\033[38;5;26m\033[48;5;26m \033[0m",
      "\033[38;5;235m\033[48;5;235m \033[0m",
      "\033[38;5;246m\033[48;5;246m \033[0m",
      "\033[38;5;124m\033[48;5;226m \033[0m"),
@@ -51,8 +57,8 @@ def _stamp_start_and_exit(grid: list[list[str]], maze: Any) -> None:
     Stamps the ENTRY and EXIT with and specific color
     markers on top of the grid.
     """
-    grid[maze.entry[1] * 2 + 1][maze.entry[0] * 2 + 1] = PALETTE[ENT_EX_COLOR]
-    grid[maze.exit[1] * 2 + 1][maze.exit[0] * 2 + 1] = PALETTE[ENT_EX_COLOR]
+    grid[maze.entry[1] * 2 + 1][maze.entry[0] * 2 + 1] = PALETTE[ENT_COLOR]
+    grid[maze.exit[1] * 2 + 1][maze.exit[0] * 2 + 1] = PALETTE[EXT_COLOR]
 
 
 def _build_base_grid(maze: Any) -> list[list[str]]:
@@ -90,11 +96,15 @@ def _build_base_grid(maze: Any) -> list[list[str]]:
 
 def _draw_grid(grid: list[list[str]]) -> None:
     """Clears screen and prints the character canvas to the terminal."""
-    print("\033[H\033[J", end="")
+    print("\033[H", end="")
     for row in grid:
         for elm in row:
             print(elm * 2, end="")
         print()
+    print("\033[0J")
+    width: int = len(grid[0])
+    print(f"{((width) - 14) * ' '} entry: {PALETTE[ENT_COLOR] * 2}   ", end="")
+    print(f"exit: {PALETTE[EXT_COLOR] * 2}")
 
 
 def render_live(maze: Any, delay: float) -> None:
