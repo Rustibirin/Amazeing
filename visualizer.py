@@ -7,7 +7,7 @@ PATH_COLOR: int = 1
 ENT_EX_COLOR: int = 2
 SOLUTION_COLOR: int = 3
 TEMPLATE_COLOR: int = 4
-PALETTE: tuple[str] = ("", "", "", "", "")
+PALETTE: tuple[str, str, str, str, str] = ("", "", "", "", "")
 
 COLOR_PALETTES = [
     ("\033[38;5;16m\033[48;5;16m \033[0m",
