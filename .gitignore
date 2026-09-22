@@ -8,3 +8,4 @@ build/
 *.egg-info/
 packet_test.py
 maze_analyzer.py
+test.py

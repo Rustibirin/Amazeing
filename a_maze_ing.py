@@ -179,7 +179,7 @@ def main() -> None:
         )
         sys.exit(1)
 
-    config_path: str = sys.argv[1]
+        return (input("Choice? (1-5): ").strip(), sol)
 
     
     print("\033c", end="")
@@ -226,6 +226,45 @@ def main() -> None:
             file=sys.stderr
         )
         sys.exit(1)
+
+    else:
+        return (settings)
+
+
+def main() -> None:
+    """Program entry point."""
+
+    if len(sys.argv) != 2:
+        print(
+            "Usage: python3 a_maze_ing.py <configuration_file>",
+            file=sys.stderr
+        )
+        sys.exit(1)
+
+    config_path: str = sys.argv[1]
+    settings: dict[str, Any] = read_config(config_path)
+    random.seed(settings['SEED'])
+
+    main_menu = Menu(settings)
+    choice, solution = main_menu.play(1)
+    while (choice != "5"):
+        if (choice == "1"):
+            choice, solution = main_menu.play(1, solution)
+        elif (choice == "2"):
+            main_menu.show_solution = not main_menu.show_solution
+            choice, solution = main_menu.play(0, solution)
+        elif (choice == "3"):
+            main_menu.colors += 1
+            choice, solution = main_menu.play(0, solution)
+        elif (choice == "4"):
+            settings = read_config(config_path)
+            if (settings != main_menu.settings):
+                main_menu.settings = settings
+                choice, solution = main_menu.play(1, solution)
+            else:
+                choice, solution = main_menu.play(0, solution)
+        else:
+            choice, solution = main_menu.play(0, solution)
 
 
 if __name__ == "__main__":
