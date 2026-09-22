@@ -1,17 +1,19 @@
 # Maze dimensions
-WIDTH=20
-HEIGHT=20
+WIDTH=90
+HEIGHT=30
 
 # Maze entry and exit coordinates
 ENTRY=0, 0
-EXIT=18, 18
+EXIT=86, 18
 
 # Output file
-OUTPUT_FILE=test.txt
+OUTPUT_FILE=maze.txt
 # ----> ¡¡Tener cuidado con los errores de permisos a la hora de crear el archivo!!
 
 # Generate a perfect maze
-PERFECT=True
+PERFECT=False
 
-# Random seed
+# Optionals
 SEED=42
+#GAME_MODE=easy
+DELAY=0.1

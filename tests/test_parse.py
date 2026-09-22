@@ -1,12 +1,13 @@
 """Unit tests for configuration parsing and validation functions."""
 
+from pathlib import Path
 import pytest
 import configuration
 
 
-def test_parse_config_valid(tmp_path: pytest.TempPathFactory) -> None:
+def test_parse_config_valid(tmp_path: Path) -> None:
     """Test parsing a valid configuration file."""
-    config_file = tmp_path / "config.txt"  # type: ignore[operator]
+    config_file = tmp_path / "config.txt"
     config_file.write_text(
         "WIDTH=10\n"
         "HEIGHT=10\n"
@@ -14,7 +15,8 @@ def test_parse_config_valid(tmp_path: pytest.TempPathFactory) -> None:
         "EXIT=9,9\n"
         "OUTPUT_FILE=out.txt\n"
         "PERFECT=True\n"
-        "SEED=42\n"
+        "SEED=42\n",
+        encoding="utf-8",
     )
 
     config = configuration.parse_config(str(config_file))
@@ -27,59 +29,103 @@ def test_parse_config_valid(tmp_path: pytest.TempPathFactory) -> None:
     assert config["SEED"] == 42
 
 
-def test_parse_config_syntax_error(
-    tmp_path: pytest.TempPathFactory
-) -> None:
+def test_parse_config_syntax_error(tmp_path: Path) -> None:
     """Test parsing a line missing an equal sign."""
-    config_file = tmp_path / "invalid_syntax.txt"  # type: ignore[operator]
-    config_file.write_text("INVALID_LINE_WITHOUT_EQUALS\n")
+    config_file = tmp_path / "invalid_syntax.txt"
+    config_file.write_text("INVALID_LINE_WITHOUT_EQUALS\n", encoding="utf-8")
 
     with pytest.raises(ValueError, match="Expected 'KEY=VALUE'"):
         configuration.parse_config(str(config_file))
 
 
-def test_parse_config_duplicate_key(
-    tmp_path: pytest.TempPathFactory
-) -> None:
+def test_parse_config_duplicate_key(tmp_path: Path) -> None:
     """Test parsing duplicate keys."""
-    config_file = tmp_path / "duplicate.txt"  # type: ignore[operator]
-    config_file.write_text("WIDTH=10\nWIDTH=20\n")
+    config_file = tmp_path / "duplicate.txt"
+    config_file.write_text("WIDTH=10\nWIDTH=20\n", encoding="utf-8")
 
     with pytest.raises(ValueError, match="Duplicate key found"):
         configuration.parse_config(str(config_file))
 
 
-def test_parse_config_invalid_int(
-    tmp_path: pytest.TempPathFactory
-) -> None:
+def test_parse_config_invalid_int(tmp_path: Path) -> None:
     """Test parsing an invalid integer value."""
-    config_file = tmp_path / "invalid_int.txt"  # type: ignore[operator]
-    config_file.write_text("WIDTH=ten\n")
+    config_file = tmp_path / "invalid_int.txt"
+    config_file.write_text("WIDTH=ten\n", encoding="utf-8")
 
     with pytest.raises(ValueError, match="Invalid value for WIDTH"):
         configuration.parse_config(str(config_file))
 
 
-def test_parse_config_invalid_coords(
-    tmp_path: pytest.TempPathFactory
-) -> None:
+def test_parse_config_invalid_coords(tmp_path: Path) -> None:
     """Test parsing invalid coordinate formatting."""
-    config_file = tmp_path / "invalid_coords.txt"  # type: ignore[operator]
-    config_file.write_text("ENTRY=0\n")
+    config_file = tmp_path / "invalid_coords.txt"
+    config_file.write_text("ENTRY=0\n", encoding="utf-8")
 
     with pytest.raises(ValueError, match="Invalid coordinates for ENTRY"):
         configuration.parse_config(str(config_file))
 
 
-def test_parse_config_invalid_boolean(
-    tmp_path: pytest.TempPathFactory
-) -> None:
+def test_parse_config_invalid_boolean(tmp_path: Path) -> None:
     """Test parsing an invalid boolean value."""
-    config_file = tmp_path / "invalid_bool.txt"  # type: ignore[operator]
-    config_file.write_text("PERFECT=Maybe\n")
+    config_file = tmp_path / "invalid_bool.txt"
+    config_file.write_text("PERFECT=Maybe\n", encoding="utf-8")
 
     with pytest.raises(ValueError, match="expected 'True' or 'False'"):
         configuration.parse_config(str(config_file))
+
+
+def test_parse_config_game_mode_and_delay(tmp_path: Path) -> None:
+    """Test parsing valid GAME_MODE and DELAY settings."""
+    config_file = tmp_path / "optional.txt"
+    config_file.write_text("GAME_MODE=easy\nDELAY=0.05\n", encoding="utf-8")
+
+    config = configuration.parse_config(str(config_file))
+    assert config["GAME_MODE"] == 0.8
+    assert config["DELAY"] == 0.05
+
+
+def test_parse_config_invalid_game_mode(tmp_path: Path) -> None:
+    """Test parsing an invalid GAME_MODE string."""
+    config_file = tmp_path / "bad_mode.txt"
+    config_file.write_text("GAME_MODE=nightmare\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="expected 'Easy', 'Medium'"):
+        configuration.parse_config(str(config_file))
+
+
+def test_parse_config_negative_delay(tmp_path: Path) -> None:
+    """Test parsing a negative DELAY value."""
+    config_file = tmp_path / "bad_delay.txt"
+    config_file.write_text("DELAY=-0.5\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="cannot be negative"):
+        configuration.parse_config(str(config_file))
+
+
+def test_parse_config_invalid_output_file(tmp_path: Path) -> None:
+    """Test parsing OUTPUT_FILE with invalid path characters."""
+    config_file = tmp_path / "bad_output.txt"
+    config_file.write_text("OUTPUT_FILE=invalid/path.txt\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Invalid character"):
+        configuration.parse_config(str(config_file))
+
+
+def test_parse_config_comments_and_blank_lines(tmp_path: Path) -> None:
+    """Test that comments and empty lines are correctly ignored."""
+    config_file = tmp_path / "comments.txt"
+    config_file.write_text(
+        "# This is a comment\n"
+        "\n"
+        "WIDTH=10\n"
+        "  # Another comment  \n"
+        "HEIGHT=10\n",
+        encoding="utf-8",
+    )
+
+    config = configuration.parse_config(str(config_file))
+    assert config["WIDTH"] == 10
+    assert config["HEIGHT"] == 10
 
 
 def test_validate_config_valid() -> None:

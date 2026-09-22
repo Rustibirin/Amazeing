@@ -6,10 +6,21 @@ and prepares the environment for maze generation.
 """
 
 import re
-from typing import Any, Dict, Tuple
+from typing import Any
+from enum import Enum
 
 
-def parse_config(file_path: str) -> Dict[str, Any]:
+class GameMode(float, Enum):
+    """Maze difficulty levels mapped to dead-end removal rates."""
+
+    BONUS = 1.0
+    EASY = 0.8
+    MEDIUM = 0.5
+    HARD = 0.3
+    INSANE = 0.1
+
+
+def parse_config(file_path: str) -> dict[str, Any]:
     """
     Reads and processes the configuration file in KEY=VALUE format.
     Empty lines and comments starting with # are ignored.
@@ -25,7 +36,7 @@ def parse_config(file_path: str) -> Dict[str, Any]:
         ValueError: If there is a syntax error in the file.
     """
 
-    config_data: Dict[str, Any] = {}
+    config_data: dict[str, Any] = {}
     pattern = re.compile(r"^[a-zA-Z0-9._-]+$")
 
     with open(file_path, mode="r", encoding="utf-8") as file:
@@ -86,13 +97,36 @@ def parse_config(file_path: str) -> Dict[str, Any]:
                     )
                 config_data[key] = val
 
-            elif key == "PERFECT":
+            elif key in ("PERFECT", "LIVE_MODE"):
                 if val.lower() not in ("true", "false"):
                     raise ValueError(
-                        f"Invalid value for PERFECT on line {line_num}: "
+                        f"Invalid value for {key} on line {line_num}: "
                         f"expected 'True' or 'False'."
                     )
                 config_data[key] = (val.lower() == "true")
+
+            elif key == "GAME_MODE":
+                if val.upper() not in GameMode.__members__:
+                    raise ValueError(
+                        f"Invalid value for GAME_MODE on line {line_num}: "
+                        f"expected 'Easy', 'Medium', 'Hard' or 'Insane'."
+                    )
+                config_data[key] = GameMode[val.upper()]
+
+            elif key == "DELAY":
+                try:
+                    config_data[key] = float(val)
+                except ValueError:
+                    raise ValueError(
+                        f"Error on line {line_num}: "
+                        f"Invalid value for {key}."
+                    ) from None
+
+                if config_data[key] < 0:
+                    raise ValueError(
+                        f"Error on line {line_num}: "
+                        f"{key} cannot be negative."
+                    )
 
             else:
                 config_data[key] = val
@@ -100,12 +134,12 @@ def parse_config(file_path: str) -> Dict[str, Any]:
     return config_data
 
 
-def validate_config(config: Dict[str, Any]) -> None:
+def validate_config(config: dict[str, Any]) -> None:
     """
     Validates that the maze parameters are correct and logically consistent.
 
     Args:
-        config: Dictionary containing the data extracted
+        config: dictionary containing the data extracted
         from the configuration file.
 
     Raises:
@@ -129,8 +163,8 @@ def validate_config(config: Dict[str, Any]) -> None:
 
     width: int = config["WIDTH"]
     height: int = config["HEIGHT"]
-    entry_point: Tuple[int, int] = config["ENTRY"]
-    exit_point: Tuple[int, int] = config["EXIT"]
+    entry_point: tuple[int, int] = config["ENTRY"]
+    exit_point: tuple[int, int] = config["EXIT"]
 
     if width <= 3 or height <= 3:
         raise ValueError(

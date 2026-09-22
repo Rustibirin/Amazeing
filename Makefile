@@ -9,7 +9,7 @@ PIP     = $(VENV)/bin/pip
 BLUE    = \033[1;34m
 ORANGE  = \033[1;31m
 PURPLE  = \033[1;35m
-GREEN   = \\033[22;38;5;46m
+GREEN   = \033[22;38;5;46m
 RESET   = \033[0m
 
 # Rules
@@ -43,6 +43,7 @@ clean:
 	@rm -rf .pytest_cache
 	@rm -rf *.egg-info
 	@rm -rf build dist
+	@rm -rf maze.txt
 	@echo "$(PURPLE)Cleanup completed.$(RESET)"
 
 .PHONY: fclean
@@ -50,6 +51,9 @@ fclean: clean
 	@rm -rf $(VENV)
 	@echo "$(ORANGE)Removing virtual environment..."
 	@echo "$(PURPLE)Virtual environment removed.$(RESET)"
+
+.PHONY: re
+re: fclean all
 
 .PHONY: lint
 lint: $(VENV)
