@@ -7,6 +7,7 @@ PATH_COLOR: int = 1
 ENT_EX_COLOR: int = 2
 SOLUTION_COLOR: int = 3
 TEMPLATES_COLOR: int = 4
+PLAYER_COLOR: int = 5
 PALETTE: tuple[str] = ("", "", "", "", "")
 
 COLOR_PALETTES = [

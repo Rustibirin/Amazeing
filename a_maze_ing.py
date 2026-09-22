@@ -136,7 +136,7 @@ def run_menu(
             break
 
         else:
-            print("Invalid choice. Please select an option from 1 to 7.")
+            print("Invalid choice. Please select an option from 1 to 8.")
             sleep(1)
 
 
