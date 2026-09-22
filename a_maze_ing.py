@@ -8,6 +8,7 @@ import configuration
 from generator import MazeGenerator
 import visualizer
 from configuration import GameMode
+import game_mode
 
 
 def toggle_game_mode(settings: dict[str, Any]) -> None:
@@ -61,6 +62,7 @@ def run_menu(
         if grid.maze:
             current_path = solution if show_path else ""
             visualizer.render_ascii(grid.maze, current_path)
+            print("\n=== Show Mode ===")
             if grid.maze.small_grid:
                 print(
                     "Warning: Maze dimensions are too "
@@ -80,7 +82,7 @@ def run_menu(
             if not settings["PERFECT"]:
                 print(
                     f"Game Mode: "
-                    f"{settings.get('GAME_MODE',GameMode.BONUS).name}"
+                    f"{settings.get('GAME_MODE', GameMode.BONUS).name}"
                 )
 
         print("\n=== A-Maze-ing ===")
@@ -90,10 +92,11 @@ def run_menu(
         print("4. Toggle Live Animation")
         print("5. Toggle Perfect Mode")
         print("6. Toggle Game Mode")
-        print("7. Quit")
+        print("7. PLAY MAZE!")
+        print("8. Quit")
 
         try:
-            choice = input("Choice? (1-7): ").strip()
+            choice = input("Choice? (1-8): ").strip()
         except (KeyboardInterrupt, EOFError):
             print("\nExiting program...")
             break
@@ -125,6 +128,10 @@ def run_menu(
             toggle_game_mode(settings)
 
         elif choice == "7":
+            if grid.maze:
+                game_mode.play_interactive(grid.maze)
+
+        elif choice == "8":
             print("Goodbye!")
             break
 

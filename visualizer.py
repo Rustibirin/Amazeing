@@ -7,6 +7,7 @@ PATH_COLOR: str = "\033[1;92m█\033[0m"
 TEMPLATE_COLOR: str = "\033[32m█\033[0m"
 ENTRY_COLOR: str = "\033[91m█\033[0m"
 EXIT_COLOR: str = "\033[91m█\033[0m"
+PLAYER_COLOR: str = "\033[1;96m@\033[0m"
 SPACE: str = " "
 
 COLOR_PALETTES = [
@@ -127,5 +128,19 @@ def render_ascii(maze: Any, solution: str = "") -> None:
         grid[current_y * 2 + 1][current_x * 2 + 1] = PATH_COLOR
 
         _stamp_start_and_exit(grid, maze)
+
+    _draw_grid(grid)
+
+
+def render_playable(maze: Any, player_x: int, player_y: int) -> None:
+    """
+    Renders the maze with an interactive player avatar.
+    """
+    grid = _build_base_grid(maze)
+
+    grid_y = player_y * 2 + 1
+    grid_x = player_x * 2 + 1
+
+    grid[grid_y][grid_x] = PLAYER_COLOR
 
     _draw_grid(grid)
