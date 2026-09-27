@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 
+import os
+import select
 import sys
 from time import sleep
 from typing import Any
 
-import parser
+from pydantic import ValidationError
+
+import game_mode
 from generator import MazeGenerator
 import visualizer
+
+# Cambiar a 'import configuration as config_module' si tu archivo es configuration.py
+import parser as config_module
 from parser import GameMode
-import game_mode
-from pydantic import ValidationError
-import select
-import os
+
 
 def flush_input() -> None:
     """Lee y descarta inmediatamente cualquier pulsación acumulada en el búfer."""
@@ -24,8 +28,8 @@ def flush_input() -> None:
 
 def error_generator(msg: str) -> None:
     print("\033c", end="")
-    print(msg)
-    sys.exit(0)
+    print(msg, file=sys.stderr)
+    sys.exit(1)
 
 
 def toggle_game_mode(settings: dict[str, Any]) -> None:
@@ -123,7 +127,7 @@ def run_menu(
         print("8. PLAY MAZE!")
         print("9. Quit")
         print("\033[J")
-        
+
         flush_input()
 
         try:
@@ -167,12 +171,12 @@ def run_menu(
             solution = run_pipeline(grid, settings, show_path)
 
         elif choice == "6":
-            if (settings["PERFECT"]):
+            if settings["PERFECT"]:
                 continue
             toggle_game_mode(settings)
             grid = MazeGenerator(settings=settings)
             solution = run_pipeline(grid, settings, show_path)
-        
+
         elif choice == "7":
             try:
                 new_settings = load_settings(config_path)
@@ -180,7 +184,7 @@ def run_menu(
                     print("No changes detected in configuration file.")
                     sleep(0.5)
                     continue
-                            
+
                 settings = new_settings
                 base_settings = new_settings.copy()
                 print("Re-generating maze with new configuration...")
@@ -208,7 +212,7 @@ def run_menu(
 
 
 def load_settings(config_path: str) -> dict[str, Any]:
-    settings = parser.parse_config(config_path)
+    settings = config_module.parse_config(config_path)
     return settings
 
 
@@ -219,14 +223,14 @@ def main() -> None:
             "Usage: python3 a_maze_ing.py <configuration_file>",
             file=sys.stderr
         )
-        sys.exit(0)
+        sys.exit(1)
 
-        return (input("Choice? (1-5): ").strip(), sol)
+    config_path: str = sys.argv[1]
 
     print("\033c", end="")
     print("Validating configuration...")
     try:
-        settings = load_settings(config_path)   
+        settings = load_settings(config_path)
 
         print()
         print("Configuration loaded and validated successfully!")
@@ -241,11 +245,11 @@ def main() -> None:
         input("\nPress Enter to continue...")
         print("\033c", end="")
 
-
         try:
             grid = MazeGenerator(settings=settings)
         except ValidationError as ex:
             error_generator(ex.errors()[0]["msg"])
+
         solution = run_pipeline(grid, settings)
         run_menu(grid, settings, solution, config_path)
 
@@ -254,14 +258,15 @@ def main() -> None:
             f"Error: The file '{config_path}' does not exist.",
             file=sys.stderr
         )
-        sys.exit(0)
+        sys.exit(1)
 
     except ValueError as e:
         print(
             f"Configuration error: {e}",
             file=sys.stderr
         )
-        sys.exit(0)
+        sys.exit(1)
+
     except KeyboardInterrupt:
         print("\nExiting the program.")
 
@@ -270,46 +275,7 @@ def main() -> None:
             f"Unexpected error: {e}",
             file=sys.stderr
         )
-        sys.exit(0)
-
-    else:
-        return (settings)
-
-
-def main() -> None:
-    """Program entry point."""
-
-    if len(sys.argv) != 2:
-        print(
-            "Usage: python3 a_maze_ing.py <configuration_file>",
-            file=sys.stderr
-        )
         sys.exit(1)
-
-    config_path: str = sys.argv[1]
-    settings: dict[str, Any] = read_config(config_path)
-    random.seed(settings['SEED'])
-
-    main_menu = Menu(settings)
-    choice, solution = main_menu.play(1)
-    while (choice != "5"):
-        if (choice == "1"):
-            choice, solution = main_menu.play(1, solution)
-        elif (choice == "2"):
-            main_menu.show_solution = not main_menu.show_solution
-            choice, solution = main_menu.play(0, solution)
-        elif (choice == "3"):
-            main_menu.colors += 1
-            choice, solution = main_menu.play(0, solution)
-        elif (choice == "4"):
-            settings = read_config(config_path)
-            if (settings != main_menu.settings):
-                main_menu.settings = settings
-                choice, solution = main_menu.play(1, solution)
-            else:
-                choice, solution = main_menu.play(0, solution)
-        else:
-            choice, solution = main_menu.play(0, solution)
 
 
 if __name__ == "__main__":

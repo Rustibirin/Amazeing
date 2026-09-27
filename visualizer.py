@@ -8,10 +8,6 @@ ENT_COLOR: int = 2
 EXT_COLOR: int = 3
 SOLUTION_COLOR: int = 4
 TEMPLATE_COLOR: int = 5
-<<<<<<< HEAD
-=======
-PALETTE: tuple[str, str, str, str, str, str] = ("", "", "", "", "", "")
->>>>>>> ddc7915f91f8b79d8ebc80f3b5f6e93ef7d4ffb6
 
 COLOR_PALETTES = [
     ("\033[38;5;16m\033[48;5;16m \033[0m",
