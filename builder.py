@@ -30,12 +30,53 @@ class Builder:
         start_cell: tuple[int, int] = (0, 0),
         exit_cell: tuple[int, int] = (1, 1)
     ) -> None:
-        """Executes the maze generation pipeline."""
-        self._create_perfect_maze(maze, animation, delay, 
-                                  start_cell, exit_cell)
+        """
+        Executes the maze generation pipeline.
+        
+        Completa SIEMPRE el laberinto al 100%. Si ocurre un KeyboardInterrupt
+        durante la animación, desactiva la animación, termina todo el proceso
+        e interrumpe al final lanzando KeyboardInterrupt.
+        """
+        if game_mode is None:
+            game_mode = 1.0
+        elif hasattr(game_mode, 'value'):
+            game_mode = float(game_mode.value)
+        else:
+            game_mode = float(game_mode)
+        was_interrupted = False
+
+        animation, delay, interrupted = self._create_perfect_maze(
+            maze, animation, delay, start_cell, exit_cell
+        )
+        if interrupted:
+            was_interrupted = True
 
         if not perfect:
-            self._pacman_mode(maze, delay, game_mode, animation)
+            animation, delay, interrupted = self._pacman_mode(
+                maze, delay, game_mode, animation
+            )
+            if interrupted:
+                was_interrupted = True
+
+        if was_interrupted:
+            raise KeyboardInterrupt
+
+    def _render_step(
+        self,
+        maze: Any,
+        animation: Callable[[Any, float], None] | None,
+        delay: float
+    ) -> Tuple[Callable[[Any, float], None] | None, float, bool]:
+        """
+        Ejecuta la animación. Si salta Ctrl+C, desactiva la animación
+        pero devuelve una bandera para continuar el algoritmo sin pausas.
+        """
+        if animation:
+            try:
+                animation(maze, delay)
+            except KeyboardInterrupt:
+                return None, 0.0, True
+        return animation, delay, False
 
     def _create_perfect_maze(
         self,
@@ -44,7 +85,7 @@ class Builder:
         delay: float,
         start_cell: tuple[int, int],
         exit_cell: tuple[int, int]
-    ) -> None:
+    ) -> Tuple[Callable[[Any, float], None] | None, float, bool]:
         valid_grid: list[Tuple[int, int]] = [
             (x, y)
             for x in range(maze.width)
@@ -52,8 +93,9 @@ class Builder:
             if not maze.is_solid(x, y)
         ]
 
+        was_interrupted = False
         if not valid_grid:
-            return
+            return animation, delay, was_interrupted
 
         force_exit_start = True if exit_cell in valid_grid else False
         
@@ -111,10 +153,16 @@ class Builder:
                     current_x, current_y, bit, opp_bit, next_x, next_y
                 )
 
-                if animation:
-                    animation(maze, delay)
+                # Renderizar paso
+                animation, delay, interrupted = self._render_step(
+                    maze, animation, delay
+                )
+                if interrupted:
+                    was_interrupted = True
 
                 cell_ptr = next_cell
+
+        return animation, delay, was_interrupted
 
     def _pacman_mode(
         self,
@@ -122,16 +170,30 @@ class Builder:
         delay: float,
         game_mode: float,
         animation: Callable[[Any, float], None] | None,
-    ) -> None:
-        self._open_corners(maze, delay, animation)
-        self._break_dead_ends(maze, game_mode, delay, animation)
+    ) -> Tuple[Callable[[Any, float], None] | None, float, bool]:
+        was_interrupted = False
+
+        animation, delay, interrupted_corners = self._open_corners(
+            maze, delay, animation
+        )
+        if interrupted_corners:
+            was_interrupted = True
+
+        animation, delay, interrupted_ends = self._break_dead_ends(
+            maze, game_mode, delay, animation
+        )
+        if interrupted_ends:
+            was_interrupted = True
+
+        return animation, delay, was_interrupted
 
     def _open_corners(
         self,
         maze: Any,
         delay: float,
         animation: Callable[[Any, float], None] | None,
-    ) -> None:
+    ) -> Tuple[Callable[[Any, float], None] | None, float, bool]:
+        was_interrupted = False
         corners = [
             (0, 0, maze.EAST, maze.SOUTH),
             (maze.width - 1, 0, maze.WEST, maze.SOUTH),
@@ -149,9 +211,13 @@ class Builder:
                             and not maze.is_solid(next_x, next_y)
                         ):
                             maze.break_wall(x, y, bit, opp_bit, next_x, next_y)
+                            animation, delay, interrupted = self._render_step(
+                                maze, animation, delay
+                            )
+                            if interrupted:
+                                was_interrupted = True
 
-                            if animation:
-                                animation(maze, delay)
+        return animation, delay, was_interrupted
 
     def _break_dead_ends(
         self,
@@ -159,8 +225,9 @@ class Builder:
         game_mode: float,
         delay: float,
         animation: Callable[[Any, float], None] | None,
-    ) -> None:
+    ) -> Tuple[Callable[[Any, float], None] | None, float, bool]:
         """breaks dead ends by tearing down extra walls, creating loops."""
+        was_interrupted = False
         dead_ends: list[Tuple[int, int]] = []
 
         for y in range(maze.height):
@@ -196,6 +263,10 @@ class Builder:
                 maze.break_wall(
                     current_x, current_y, bit, opp_bit, next_x, next_y
                 )
+                animation, delay, interrupted = self._render_step(
+                    maze, animation, delay
+                )
+                if interrupted:
+                    was_interrupted = True
 
-                if animation:
-                    animation(maze, delay)
+        return animation, delay, was_interrupted

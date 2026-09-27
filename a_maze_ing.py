@@ -4,11 +4,28 @@ import sys
 from time import sleep
 from typing import Any
 
-import configuration
+import parser
 from generator import MazeGenerator
 import visualizer
-from configuration import GameMode
+from parser import GameMode
 import game_mode
+from pydantic import ValidationError
+import select
+import os
+
+def flush_input() -> None:
+    """Lee y descarta inmediatamente cualquier pulsación acumulada en el búfer."""
+    try:
+        while select.select([sys.stdin], [], [], 0.0)[0]:
+            os.read(sys.stdin.fileno(), 1024)
+    except (OSError, ValueError):
+        pass
+
+
+def error_generator(msg: str) -> None:
+    print("\033c", end="")
+    print(msg)
+    sys.exit(0)
 
 
 def toggle_game_mode(settings: dict[str, Any]) -> None:
@@ -28,7 +45,6 @@ def run_pipeline(
     Executes the maze pipeline: generation,
     solving, exporting, and optional animation.
     """
-    print("Building and solving maze...")
     live = None
     if settings.get("LIVE_MODE"):
         live = visualizer.render_live
@@ -40,6 +56,7 @@ def run_pipeline(
         solution = grid.solve()
         grid.export()
 
+        print("\033c", end="")
         if settings.get("LIVE_MODE") and grid.maze and show_path:
             visualizer.animate_solution(
                 grid.maze,
@@ -47,9 +64,13 @@ def run_pipeline(
                 delay=settings.get("DELAY", 0.0),
             )
     except KeyboardInterrupt:
-        solution = grid.solve()
-        grid.export()
-        visualizer.render_ascii(grid.maze, solution)
+        print("\033c", end="")
+        if grid.maze is not None:
+            solution = grid.solve()
+            grid.export()
+            visualizer.render_ascii(grid.maze, solution)
+        else:
+            solution = ""
 
     return solution
 
@@ -66,6 +87,7 @@ def run_menu(
     while True:
         if grid.maze:
             current_path = solution if show_path else ""
+            print("\033c", end="")
             visualizer.render_ascii(grid.maze, current_path)
             print("\n=== Show Mode ===")
             if grid.maze.small_grid:
@@ -96,10 +118,13 @@ def run_menu(
         print("3. Rotate wall colours")
         print("4. Toggle Live Animation")
         print("5. Toggle Perfect Mode")
-        print("6. Toggle Game Mode")
+        print("6. Toggle Game Mode (Imperfect mode)")
         print("7. Charge new settings")
         print("8. PLAY MAZE!")
         print("9. Quit")
+        print("\033[J")
+        
+        flush_input()
 
         try:
             choice = input("Choice? (1-9): ").strip()
@@ -109,7 +134,12 @@ def run_menu(
 
         if choice == "1":
             print("Re-generating maze...")
+            sleep(0.5)
             settings.pop("SEED", None)
+            try:
+                grid = MazeGenerator(settings=settings)
+            except ValidationError as ex:
+                error_generator(ex.errors()[0]["msg"])
             solution = run_pipeline(grid, settings, show_path)
 
         elif choice == "2":
@@ -133,24 +163,36 @@ def run_menu(
 
         elif choice == "5":
             settings["PERFECT"] = not settings["PERFECT"]
+            grid = MazeGenerator(settings=settings)
+            solution = run_pipeline(grid, settings, show_path)
 
         elif choice == "6":
+            if (settings["PERFECT"]):
+                continue
             toggle_game_mode(settings)
+            grid = MazeGenerator(settings=settings)
+            solution = run_pipeline(grid, settings, show_path)
         
         elif choice == "7":
             try:
                 new_settings = load_settings(config_path)
-                if (new_settings == base_settings):
-                    raise FileNotFoundError
-                print("\033[0H\033[0J")
+                if new_settings == base_settings:
+                    print("No changes detected in configuration file.")
+                    sleep(0.5)
+                    continue
+                            
                 settings = new_settings
-                print("Re-generating maze...")
+                base_settings = new_settings.copy()
+                print("Re-generating maze with new configuration...")
                 settings.pop("SEED", None)
-                grid = MazeGenerator(settings)
+                try:
+                    grid = MazeGenerator(settings=settings)
+                except ValidationError as ex:
+                    error_generator(ex.errors()[0]["msg"])
                 solution = run_pipeline(grid, settings, show_path)
-            except Exception:
-                print("No more changes to reflect")
-                sleep(1)
+            except Exception as e:
+                print(f"Error loading settings: {e}")
+                sleep(0.5)
 
         elif choice == "8":
             if grid.maze:
@@ -162,13 +204,13 @@ def run_menu(
 
         else:
             print("Invalid choice. Please select an option from 1 to 9.")
-            sleep(1)
+            sleep(0.5)
 
 
 def load_settings(config_path: str) -> dict[str, Any]:
-    settings = configuration.parse_config(config_path)
-    configuration.validate_config(settings)
-    return (settings)
+    settings = parser.parse_config(config_path)
+    return settings
+
 
 def main() -> None:
     """Program entry point."""
@@ -177,11 +219,10 @@ def main() -> None:
             "Usage: python3 a_maze_ing.py <configuration_file>",
             file=sys.stderr
         )
-        sys.exit(1)
+        sys.exit(0)
 
     config_path: str = sys.argv[1]
 
-    
     print("\033c", end="")
     print("Validating configuration...")
     try:
@@ -196,11 +237,15 @@ def main() -> None:
         if "SEED" in settings:
             print(f"Seed: {settings['SEED']}")
 
-        print()
+        flush_input()
         input("\nPress Enter to continue...")
-        print("\033[0H\033[0J")
+        print("\033c", end="")
 
-        grid = MazeGenerator(settings)
+
+        try:
+            grid = MazeGenerator(settings=settings)
+        except ValidationError as ex:
+            error_generator(ex.errors()[0]["msg"])
         solution = run_pipeline(grid, settings)
         run_menu(grid, settings, solution, config_path)
 
@@ -209,14 +254,14 @@ def main() -> None:
             f"Error: The file '{config_path}' does not exist.",
             file=sys.stderr
         )
-        sys.exit(1)
+        sys.exit(0)
 
     except ValueError as e:
         print(
             f"Configuration error: {e}",
             file=sys.stderr
         )
-        sys.exit(1)
+        sys.exit(0)
     except KeyboardInterrupt:
         print("\nExiting the program.")
 
@@ -225,7 +270,7 @@ def main() -> None:
             f"Unexpected error: {e}",
             file=sys.stderr
         )
-        sys.exit(1)
+        sys.exit(0)
 
 
 if __name__ == "__main__":

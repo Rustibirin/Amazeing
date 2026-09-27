@@ -8,7 +8,6 @@ ENT_COLOR: int = 2
 EXT_COLOR: int = 3
 SOLUTION_COLOR: int = 4
 TEMPLATE_COLOR: int = 5
-PALETTE: tuple[str, str, str, str, str] = ("", "", "", "", "")
 
 COLOR_PALETTES = [
     ("\033[38;5;16m\033[48;5;16m \033[0m",
@@ -42,7 +41,19 @@ COLOR_PALETTES = [
      "\033[38;5;246m\033[48;5;246m \033[0m",
      "\033[38;5;124m\033[48;5;226m \033[0m"),
 ]
+
 current_palette_idx = 0
+PALETTE = COLOR_PALETTES[0]
+
+
+def _clean_delay(delay: Any) -> float:
+    """FIX 2: Garantiza que delay sea siempre un float valido y nunca None."""
+    if delay is None:
+        return 0.0
+    try:
+        return float(delay)
+    except (ValueError, TypeError):
+        return 0.0
 
 
 def rotate_color() -> None:
@@ -54,7 +65,7 @@ def rotate_color() -> None:
 
 def _stamp_start_and_exit(grid: list[list[str]], maze: Any) -> None:
     """
-    Stamps the ENTRY and EXIT with and specific color
+    Stamps the ENTRY and EXIT with specific color
     markers on top of the grid.
     """
     grid[maze.entry[1] * 2 + 1][maze.entry[0] * 2 + 1] = PALETTE[ENT_COLOR]
@@ -80,9 +91,7 @@ def _build_base_grid(maze: Any) -> list[list[str]]:
                 for move_x, move_y, _, _ in maze.DIR_MAP.values():
                     nx, ny = x + move_x, y + move_y
                     if maze.in_grid(nx, ny) and maze.is_solid(nx, ny):
-                        grid[grid_y
-                             + move_y][grid_x
-                                       + move_x] = PALETTE[TEMPLATE_COLOR]
+                        grid[grid_y + move_y][grid_x + move_x] = PALETTE[TEMPLATE_COLOR]
                 continue
 
             if maze.in_maze(x, y):
@@ -90,9 +99,7 @@ def _build_base_grid(maze: Any) -> list[list[str]]:
                 val = maze.matrix[y][x]
                 for move_x, move_y, bit, _ in maze.DIR_MAP.values():
                     if not (val & bit):
-                        grid[grid_y
-                             + move_y][grid_x
-                                       + move_x] = PALETTE[PATH_COLOR]
+                        grid[grid_y + move_y][grid_x + move_x] = PALETTE[PATH_COLOR]
 
     _stamp_start_and_exit(grid, maze)
     return grid
@@ -107,20 +114,23 @@ def _draw_grid(grid: list[list[str]]) -> None:
         print()
     print("\033[0J")
     width: int = len(grid[0])
-    print(f"{((width) - 14) * ' '} entry: {PALETTE[ENT_COLOR] * 2}   ", end="")
+    padding = max(0, width - 14)
+    print(f"{padding * ' '} entry: {PALETTE[ENT_COLOR] * 2}   ", end="")
     print(f"exit: {PALETTE[EXT_COLOR] * 2}")
 
 
-def render_live(maze: Any, delay: float) -> None:
+def render_live(maze: Any, delay: Any = 0.0) -> None:
     """Renders only the current state of maze generation in real-time."""
+    d_val = _clean_delay(delay)
     grid = _build_base_grid(maze)
     _draw_grid(grid)
-    if delay > 0:
-        time.sleep(delay)
+    if d_val > 0:
+        time.sleep(d_val)
 
 
-def animate_solution(maze: Any, solution: str, delay: float) -> None:
+def animate_solution(maze: Any, solution: str, delay: Any = 0.0) -> None:
     """Animates the solution path step-by-step on top of the rendered maze."""
+    d_val = _clean_delay(delay)
     grid = _build_base_grid(maze)
     current_x, current_y = maze.entry
 
@@ -137,8 +147,8 @@ def animate_solution(maze: Any, solution: str, delay: float) -> None:
         current_y += move_y
 
         _draw_grid(grid)
-        if delay > 0:
-            time.sleep(delay)
+        if d_val > 0:
+            time.sleep(d_val)
 
     _stamp_start_and_exit(grid, maze)
     _draw_grid(grid)
