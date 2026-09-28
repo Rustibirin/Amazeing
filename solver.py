@@ -5,17 +5,17 @@ from typing import Any
 
 
 class Solver:
-    """Calculates the shortest path in a maze using the BFS algorithm."""
+    """
+    Calculates the shortest path in a maze using the BFS algorithm.
+    """
 
     def solve(self, maze: Any) -> str:
-        """Finds the shortest path sequence from entry to exit.
-
+        """
+        Finds the shortest path sequence from entry to exit.
         Args:
             maze: Instance of the Maze model.
-
         Returns:
             str: Optimal path sequence (e.g., "NNEESSW").
-
         Raises:
             ValueError: If no accessible path exists between entry and exit.
         """
@@ -51,7 +51,10 @@ class Solver:
             self._reset_visited_flags(maze)
 
     def _reset_visited_flags(self, maze: Any) -> None:
-        """Clears VISITED bit flags consumed during the pathfinding search."""
+        """
+        Clears VISITED bit flags consumed during the pathfinding search.
+        """
+
         for y in range(maze.height):
             for x in range(maze.width):
                 if maze.is_visited(x, y):

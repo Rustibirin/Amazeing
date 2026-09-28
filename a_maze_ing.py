@@ -5,20 +5,19 @@ import select
 import sys
 from time import sleep
 from typing import Any
-
 from pydantic import ValidationError
-
 import game_mode
 from generator import MazeGenerator
 import visualizer
-
-# Cambiar a 'import configuration as config_module' si tu archivo es configuration.py
 import parser as config_module
 from parser import GameMode
 
 
 def flush_input() -> None:
-    """Lee y descarta inmediatamente cualquier pulsación acumulada en el búfer."""
+    """
+    Discard any key saved in buffer.
+    """
+
     try:
         while select.select([sys.stdin], [], [], 0.0)[0]:
             os.read(sys.stdin.fileno(), 1024)
@@ -27,13 +26,20 @@ def flush_input() -> None:
 
 
 def error_generator(msg: str) -> None:
+    """
+    Show an error and finalise the execution.
+    """
+
     print("\033c", end="")
     print(msg, file=sys.stderr)
     sys.exit(1)
 
 
 def toggle_game_mode(settings: dict[str, Any]) -> None:
-    """Cycles through the available GameModes in the settings."""
+    """
+    Cycles through the available GameModes in the settings.
+    """
+
     modes = list(GameMode)
     current_mode = settings.get("GAME_MODE", GameMode.BONUS)
     next_index = (modes.index(current_mode) + 1) % len(modes)
@@ -43,12 +49,13 @@ def toggle_game_mode(settings: dict[str, Any]) -> None:
 def run_pipeline(
     grid: MazeGenerator,
     settings: dict[str, Any],
-    show_path: bool = True,
+    show_path: bool = True
 ) -> str:
     """
     Executes the maze pipeline: generation,
     solving, exporting, and optional animation.
     """
+
     live = None
     if settings.get("LIVE_MODE"):
         live = visualizer.render_live
@@ -85,9 +92,12 @@ def run_menu(
     solution: str,
     config_path: str
 ) -> None:
-    """Handles the interactive terminal menu loop."""
+    """
+    Handles the interactive terminal menu loop.
+    """
+
     show_path: bool = False
-    base_settings: dict = settings.copy()
+    base_settings: dict[str, Any] = settings.copy()
     while True:
         if grid.maze:
             current_path = solution if show_path else ""
@@ -212,12 +222,19 @@ def run_menu(
 
 
 def load_settings(config_path: str) -> dict[str, Any]:
+    """
+    Charge the config parameters in a valid dictionary.
+    """
+
     settings = config_module.parse_config(config_path)
     return settings
 
 
 def main() -> None:
-    """Program entry point."""
+    """
+    Program entry point.
+    """
+
     if len(sys.argv) != 2:
         print(
             "Usage: python3 a_maze_ing.py <configuration_file>",
@@ -254,27 +271,18 @@ def main() -> None:
         run_menu(grid, settings, solution, config_path)
 
     except FileNotFoundError:
-        print(
-            f"Error: The file '{config_path}' does not exist.",
-            file=sys.stderr
-        )
+        print(f"Error: File '{config_path}' does not exist.", file=sys.stderr)
         sys.exit(1)
 
     except ValueError as e:
-        print(
-            f"Configuration error: {e}",
-            file=sys.stderr
-        )
+        print(f"Configuration error: {e}", file=sys.stderr)
         sys.exit(1)
 
     except KeyboardInterrupt:
         print("\nExiting the program.")
 
     except Exception as e:
-        print(
-            f"Unexpected error: {e}",
-            file=sys.stderr
-        )
+        print(f"Unexpected error: {e}", file=sys.stderr)
         sys.exit(1)
 
 

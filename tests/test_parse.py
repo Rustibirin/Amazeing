@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import pytest
-import configuration
+import configuration  # type: ignore[import-not-found]
 
 
 def test_parse_config_valid(tmp_path: Path) -> None:

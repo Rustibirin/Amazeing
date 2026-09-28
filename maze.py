@@ -29,6 +29,10 @@ class Maze:
             self,
             settings: dict[str, Any],
     ) -> None:
+        """
+        Instanciate the Maze with all the initial configurations.
+        """
+
         self.width: int = settings["WIDTH"]
         self.height: int = settings["HEIGHT"]
         self.entry: tuple[int, int] = settings["ENTRY"]
@@ -41,6 +45,10 @@ class Maze:
         self._apply_templates()
 
     def _build_initial_matrix(self) -> list[list[int]]:
+        """
+        Make the initial maze with the whole walls up.
+        """
+
         matrix = []
 
         for _ in range(self.height):
@@ -52,36 +60,80 @@ class Maze:
         return matrix
 
     def in_grid(self, x: int, y: int) -> bool:
+        """
+        Return True or False if the cell is inside the bounds.
+        """
+
         return 0 <= x < self.width and 0 <= y < self.height
 
     def in_maze(self, x: int, y: int) -> bool:
+        """
+        Return True or False if the cell is inside the solution.
+        """
+
         return bool(self.matrix[y][x] & self.IN_MAZE)
 
     def mark_in_maze(self, x: int, y: int) -> None:
+        """
+        Mark a cell if is part of the shortest solution.
+        """
+
         self.matrix[y][x] |= self.IN_MAZE
 
     def is_solid(self, x: int, y: int) -> bool:
+        """
+        Return True or False if the cell is solid.
+        """
+
         return bool(self.matrix[y][x] & self.SOLID)
 
     def mark_solid(self, x: int, y: int) -> None:
+        """
+        Mark a cell as a solid/undestroyable point.
+        """
+
         self.matrix[y][x] |= self.SOLID
 
     def is_visited(self, x: int, y: int) -> bool:
+        """
+        Return True or False if the cell was visitted before.
+        """
+
         return bool(self.matrix[y][x] & self.VISITED)
 
     def mark_visited(self, x: int, y: int) -> None:
+        """
+        Mark a cell as a visited point.
+        """
+
         self.matrix[y][x] |= self.VISITED
 
     def clear_visited(self, x: int, y: int) -> None:
+        """
+        Clear a cell to unvisited it.
+        """
+
         self.matrix[y][x] &= ~self.VISITED
 
     def get_wall_mask(self, x: int, y: int) -> int:
+        """
+        Return the decimal number depending of the walls which are up.
+        """
+
         return self.matrix[y][x] & self.ALL_WALLS_MASK
 
     def has_wall(self, x: int, y: int, wall_bit: int) -> bool:
+        """
+        Return True or False depending if a cell has a wall in a direction.
+        """
+
         return bool(self.matrix[y][x] & wall_bit)
 
     def _break_partition(self, x: int, y: int, wall_bit: int) -> None:
+        """
+        Invert a bit in an specific cell to destroy its wall.
+        """
+
         self.matrix[y][x] &= ~wall_bit
 
     def break_wall(
@@ -93,6 +145,10 @@ class Maze:
         next_x: int | None = None,
         next_y: int | None = None
     ) -> None:
+        """
+        Its called to break a wall in the maze by changing a specific bit.
+        """
+
         self._break_partition(x, y, bit)
 
         if (
@@ -103,6 +159,10 @@ class Maze:
             self._break_partition(next_x, next_y, opp_bit)
 
     def _get_center(self, symbol: list[list[int]]) -> tuple[int, int]:
+        """
+        Defines the coordinates where is represented the center.
+        """
+
         symbol_height = len(symbol)
         symbol_width = len(symbol[0])
 
@@ -111,12 +171,20 @@ class Maze:
         return start_x, start_y
 
     def _get_bottom_left(self, symbol: list[list[int]]) -> tuple[int, int]:
+        """
+        Defines the coordinates where is represented the bottom right
+        """
+
         symbol_height = len(symbol)
         start_x = 1
         start_y = self.height - symbol_height - 1
         return start_x, start_y
 
     def _get_bottom_right(self, symbol: list[list[int]]) -> tuple[int, int]:
+        """
+        Defines the coordinates where is represented the bottom right.
+        """
+
         symbol_height = len(symbol)
         symbol_width = len(symbol[0])
         start_x = self.width - symbol_width - 1
@@ -126,6 +194,10 @@ class Maze:
     def _get_position_coords(
         self, symbol: list[list[int]], position: str
     ) -> tuple[int, int]:
+        """
+        Extract the coordinates of a specific stamp.
+        """
+
         if position == "bottom_left":
             return self._get_bottom_left(symbol)
         if position == "bottom_right":
@@ -137,7 +209,10 @@ class Maze:
             symbol: list[list[int]],
             position: str = "center",
     ) -> bool:
-        """Checks if the maze is large enough and has no collisions."""
+        """
+        Checks if the maze is large enough and has no collisions.
+        """
+
         if not symbol or not symbol[0]:
             return False
 
@@ -165,7 +240,10 @@ class Maze:
         return True
 
     def _apply_templates(self) -> None:
-        """Attempts to embed the 42 symbol and developer easter eggs."""
+        """
+        Attempts to embed the 42 symbol and developer easter eggs.
+        """
+
         symbol_42 = TEMPLATES.get("42_symbol")
         if symbol_42:
             self.has_42 = self.embed_symbol(symbol_42, position="center")
@@ -194,7 +272,10 @@ class Maze:
     def embed_symbol(
         self, symbol: list[list[int]], position: str = "center"
     ) -> bool:
-        """Stamp a symbol if validation passes. Returns success."""
+        """
+        Stamp a symbol if validation passes. Returns success.
+        """
+
         if not self.can_stamp_symbol(symbol, position):
             return False
 

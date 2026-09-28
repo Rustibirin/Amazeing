@@ -91,7 +91,9 @@ def _build_base_grid(maze: Any) -> list[list[str]]:
                 for move_x, move_y, _, _ in maze.DIR_MAP.values():
                     nx, ny = x + move_x, y + move_y
                     if maze.in_grid(nx, ny) and maze.is_solid(nx, ny):
-                        grid[grid_y + move_y][grid_x + move_x] = PALETTE[TEMPLATE_COLOR]
+                        c1 = grid_y + move_y
+                        c2 = grid_x + move_x
+                        grid[c1][c2] = PALETTE[TEMPLATE_COLOR]
                 continue
 
             if maze.in_maze(x, y):
@@ -99,7 +101,9 @@ def _build_base_grid(maze: Any) -> list[list[str]]:
                 val = maze.matrix[y][x]
                 for move_x, move_y, bit, _ in maze.DIR_MAP.values():
                     if not (val & bit):
-                        grid[grid_y + move_y][grid_x + move_x] = PALETTE[PATH_COLOR]
+                        c1 = grid_y + move_y
+                        c2 = grid_x + move_x
+                        grid[c1][c2] = PALETTE[PATH_COLOR]
 
     _stamp_start_and_exit(grid, maze)
     return grid
@@ -159,6 +163,7 @@ def render_ascii(maze: Any, solution: str = "") -> None:
     Renders the complete maze at once,
     optionally overlaying the solution path.
     """
+
     global PALETTE
 
     PALETTE = COLOR_PALETTES[current_palette_idx]
@@ -185,6 +190,7 @@ def render_playable(maze: Any, player_x: int, player_y: int) -> None:
     """
     Renders the maze with an interactive player avatar.
     """
+
     grid = _build_base_grid(maze)
 
     grid_y = player_y * 2 + 1

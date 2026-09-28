@@ -10,10 +10,7 @@ class Builder:
     Wilson's algorithm and Pac-Man mode.
     """
 
-    def __init__(
-        self,
-        seed: int | None = None,
-    ) -> None:
+    def __init__(self, seed: int | None = None) -> None:
         if seed is None:
             seed = random.randint(1, 2**31 - 1)
 
@@ -31,12 +28,11 @@ class Builder:
         exit_cell: tuple[int, int] = (1, 1)
     ) -> None:
         """
-        Executes the maze generation pipeline.
-        
-        Completa SIEMPRE el laberinto al 100%. Si ocurre un KeyboardInterrupt
-        durante la animación, desactiva la animación, termina todo el proceso
-        e interrumpe al final lanzando KeyboardInterrupt.
+        Executes the maze generation pipeline, always making it complete
+        if during the animation it is interrupted it finish the generation
+        without more animations.
         """
+
         if game_mode is None:
             game_mode = 1.0
         elif hasattr(game_mode, 'value'):
@@ -68,9 +64,10 @@ class Builder:
         delay: float
     ) -> Tuple[Callable[[Any, float], None] | None, float, bool]:
         """
-        Ejecuta la animación. Si salta Ctrl+C, desactiva la animación
-        pero devuelve una bandera para continuar el algoritmo sin pausas.
+        Execute the animation but can control an Interrupt made
+        by keyboard to finish it.
         """
+
         if animation:
             try:
                 animation(maze, delay)
@@ -92,13 +89,16 @@ class Builder:
             for y in range(maze.height)
             if not maze.is_solid(x, y)
         ]
+        """
+        Create a perfect maze with no loop using any algorithm.
+        """
 
         was_interrupted = False
         if not valid_grid:
             return animation, delay, was_interrupted
 
         force_exit_start = True if exit_cell in valid_grid else False
-        
+
         maze.mark_in_maze(start_cell[0], start_cell[1])
         cells_in_maze = 1
         total_valid = len(valid_grid)
@@ -118,7 +118,7 @@ class Builder:
                 force_exit_start = False
             else:
                 walk_start = random.choice(unvisited)
-                
+
             current = walk_start
 
             walk: Dict[Tuple[int, int], Tuple[Tuple[int, int], int, int]] = {}
@@ -172,6 +172,10 @@ class Builder:
         animation: Callable[[Any, float], None] | None,
     ) -> Tuple[Callable[[Any, float], None] | None, float, bool]:
         was_interrupted = False
+        """
+        Transform a perfect maze making it pacman mode, introducing loops,
+        dead-ends and some improvements.
+        """
 
         animation, delay, interrupted_corners = self._open_corners(
             maze, delay, animation
@@ -200,6 +204,9 @@ class Builder:
             (0, maze.height - 1, maze.EAST, maze.NORTH),
             (maze.width - 1, maze.height - 1, maze.WEST, maze.NORTH),
         ]
+        """
+        Open the corners of the maze to validate the pacman mode.
+        """
 
         for x, y, dir1, dir2 in corners:
             if not maze.is_solid(x, y):
@@ -226,7 +233,10 @@ class Builder:
         delay: float,
         animation: Callable[[Any, float], None] | None,
     ) -> Tuple[Callable[[Any, float], None] | None, float, bool]:
-        """breaks dead ends by tearing down extra walls, creating loops."""
+        """
+        Breaks dead ends by tearing down extra walls, creating loops.
+        """
+
         was_interrupted = False
         dead_ends: list[Tuple[int, int]] = []
 

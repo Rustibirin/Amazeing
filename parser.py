@@ -5,14 +5,15 @@ This script receives a configuration file, validates it,
 and prepares the environment for maze generation.
 """
 
-import re
-from typing import Any
 from enum import Enum
 import sys
+from typing import Any
 
 
 class GameMode(float, Enum):
-    """Maze difficulty levels mapped to dead-end removal rates."""
+    """
+    Maze difficulty levels mapped to dead-end removal rates.
+    """
 
     BONUS = 1.0
     EASY = 0.8
@@ -21,8 +22,11 @@ class GameMode(float, Enum):
     INSANE = 0.1
 
 
-def parse_val(val: str) -> dict:
-    """Parsea tipos primitivos y tuplas especificas."""
+def parse_val(val: str) -> Any:
+    """
+    Parse basic types and tuples of points.
+    """
+
     if val in ("True", "true"):
         return True
     if val in ("False", "false"):
@@ -30,7 +34,8 @@ def parse_val(val: str) -> dict:
 
     if "," in val:
         partes = [p.strip() for p in val.split(",")]
-        if len(partes) == 2 and all(p.isdigit() or (p.startswith('-') and p[1:].isdigit()) for p in partes):
+        if len(partes) == 2 and all(p.isdigit() or (p.startswith('-')
+           and p[1:].isdigit()) for p in partes):
             return (int(partes[0]), int(partes[1]))
         raise ValueError(f"Invalid tuple format: {val}")
 
@@ -45,9 +50,14 @@ def parse_val(val: str) -> dict:
     return val
 
 
-def parse_config(path: str) -> dict:
+def parse_config(path: str) -> dict[str, Any]:
+    """
+    Extract all of the keys from the config_file
+    and define them as the specific type.
+    """
+
     config = {}
-    
+
     try:
         with open(path, 'r', encoding='utf-8') as f:
             for num_line, line in enumerate(f, start=1):
@@ -56,7 +66,8 @@ def parse_config(path: str) -> dict:
                     continue
 
                 if '=' not in clean_line:
-                    print(f"Syntax error in the line {num_line}: is missed '='", file=sys.stderr)
+                    text = f"Syntax error in the line {num_line}:"
+                    print(f"{text} is missed '='", file=sys.stderr)
                     sys.exit(0)
 
                 key, value = clean_line.split('=', 1)
@@ -65,7 +76,8 @@ def parse_config(path: str) -> dict:
                 try:
                     config[key] = parse_val(value)
                 except ValueError as e:
-                    print(f"Error in line {num_line} to '{key}': {e}", file=sys.stderr)
+                    text = f"Error in line {num_line} to '{key}'"
+                    print(f"{text}: {e}", file=sys.stderr)
                     sys.exit(0)
 
     except FileNotFoundError:
