@@ -27,7 +27,10 @@ def flush_input() -> None:
 
 def error_generator(msg: str) -> NoReturn:
     """
-    Show an error and finalise the execution.
+    Clears terminal, prints an error message to stderr, and exits the program.
+
+    Args:
+        msg: The error message to be displayed.
     """
 
     print("\033c", end="")
@@ -52,8 +55,16 @@ def run_pipeline(
     show_path: bool = True
 ) -> str:
     """
-    Executes the maze pipeline: generation,
-    solving, exporting, and optional animation.
+    Executes the maze lifecycle: generation, solving,
+    exporting, and optional live rendering.
+
+    Args:
+        grid: The MazeGenerator instance to operate on.
+        settings: Dictionary containing execution settings.
+        show_path: Whether to display the solution path during animation.
+
+    Returns:
+        str: The shortest path solution sequence.
     """
 
     live = None
@@ -93,7 +104,13 @@ def run_menu(
     config_path: str
 ) -> None:
     """
-    Handles the interactive terminal menu loop.
+    Runs the main interactive terminal menu loop for user interaction.
+
+    Args:
+        grid: Current MazeGenerator instance.
+        settings: Dictionary of active settings.
+        solution: Initial shortest path solution string.
+        config_path: Path to the external configuration file for reloads.
     """
 
     show_path: bool = False
@@ -223,7 +240,13 @@ def run_menu(
 
 def load_settings(config_path: str) -> dict[str, Any]:
     """
-    Charge the config parameters in a valid dictionary.
+    Loads and validates configuration parameters from a file.
+
+    Args:
+        config_path: File system path to the configuration file.
+
+    Returns:
+        dict[str, Any]: Validated configuration settings.
     """
 
     settings = config_module.parse_config(config_path)

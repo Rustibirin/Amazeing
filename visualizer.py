@@ -1,3 +1,8 @@
+"""
+Terminal ANSI Visualizer Module for Maze Generation,
+Play, and Solution Animation.
+"""
+
 import time
 from typing import Any
 
@@ -47,7 +52,7 @@ PALETTE = COLOR_PALETTES[0]
 
 
 def _clean_delay(delay: Any) -> float:
-    """FIX 2: Garantiza que delay sea siempre un float valido y nunca None."""
+    """Ensures delay is a valid float >= 0.0."""
     if delay is None:
         return 0.0
     try:

@@ -30,7 +30,11 @@ class Maze:
             settings: dict[str, Any],
     ) -> None:
         """
-        Instanciate the Maze with all the initial configurations.
+        Instantiates the Maze with initial configuration settings.
+
+        Args:
+            settings: Dictionary containing
+            WIDTH, HEIGHT, ENTRY, and EXIT keys.
         """
 
         self.width: int = settings["WIDTH"]
@@ -96,7 +100,7 @@ class Maze:
 
     def is_visited(self, x: int, y: int) -> bool:
         """
-        Return True or False if the cell was visitted before.
+        Return True or False if the cell was visited before.
         """
 
         return bool(self.matrix[y][x] & self.VISITED)
@@ -172,7 +176,7 @@ class Maze:
 
     def _get_bottom_left(self, symbol: list[list[int]]) -> tuple[int, int]:
         """
-        Defines the coordinates where is represented the bottom right
+        Defines the coordinates where is represented the bottom left
         """
 
         symbol_height = len(symbol)

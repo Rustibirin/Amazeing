@@ -1,3 +1,8 @@
+"""
+Template definitions for embedding visual
+patterns and easter eggs into the maze.
+"""
+
 SYMBOL_42 = [
     [1, 0, 0, 0, 1, 1, 1],
     [1, 0, 1, 0, 0, 0, 1],

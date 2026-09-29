@@ -59,7 +59,7 @@ class MazeGenerator(BaseModel):
         """
 
         if (self.settings['WIDTH'] < 4 or self.settings['HEIGHT'] < 4):
-            msg: str = "The widht and height of the maze must be at least 4"
+            msg: str = "The width and height of the maze must be at least 4"
             raise ValueError(f"{msg} cells for each dimension.")
 
         entry_cell = self.settings['ENTRY']
@@ -123,9 +123,7 @@ class MazeGenerator(BaseModel):
                 perfect=self.settings['PERFECT'],
                 delay=delay,
                 game_mode=game_mode_val,
-                animation=animation,
-                start_cell=self.settings['ENTRY'],
-                exit_cell=self.settings['EXIT']
+                animation=animation
             )
         except KeyboardInterrupt:
             builder.build(
@@ -133,9 +131,7 @@ class MazeGenerator(BaseModel):
                 perfect=self.settings["PERFECT"],
                 delay=delay,
                 game_mode=game_mode_val,
-                animation=None,
-                start_cell=self.settings['ENTRY'],
-                exit_cell=self.settings['EXIT']
+                animation=None
             )
             raise KeyboardInterrupt
 

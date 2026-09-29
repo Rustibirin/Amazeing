@@ -33,10 +33,10 @@ def parse_val(val: str) -> Any:
         return False
 
     if "," in val:
-        partes = [p.strip() for p in val.split(",")]
-        if len(partes) == 2 and all(p.isdigit() or (p.startswith('-')
-           and p[1:].isdigit()) for p in partes):
-            return (int(partes[0]), int(partes[1]))
+        parts = [p.strip() for p in val.split(",")]
+        if len(parts) == 2 and all(p.isdigit() or (p.startswith('-')
+           and p[1:].isdigit()) for p in parts):
+            return (int(parts[0]), int(parts[1]))
         raise ValueError(f"Invalid tuple format: {val}")
 
     if val.isdigit() or (val.startswith('-') and val[1:].isdigit()):
@@ -68,7 +68,7 @@ def parse_config(path: str) -> dict[str, Any]:
                 if '=' not in clean_line:
                     text = f"Syntax error in the line {num_line}:"
                     print(f"{text} is missed '='", file=sys.stderr)
-                    sys.exit(0)
+                    sys.exit(1)
 
                 key, value = clean_line.split('=', 1)
                 key, value = key.strip(), value.strip()
@@ -78,13 +78,13 @@ def parse_config(path: str) -> dict[str, Any]:
                 except ValueError as e:
                     text = f"Error in line {num_line} to '{key}'"
                     print(f"{text}: {e}", file=sys.stderr)
-                    sys.exit(0)
+                    sys.exit(1)
 
     except FileNotFoundError:
         print(f"Error: '{path}' no existe.", file=sys.stderr)
-        sys.exit(0)
+        sys.exit(1)
     except PermissionError:
         print(f"Error: No allow to read '{path}'.", file=sys.stderr)
-        sys.exit(0)
+        sys.exit(1)
 
     return config
