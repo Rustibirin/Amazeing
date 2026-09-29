@@ -109,6 +109,9 @@ class MazeGenerator(BaseModel):
     ) -> Tuple[Maze, bool]:
         """
         Generates the maze structure using the configured parameters.
+    ) -> Maze:
+        """Generates the maze structure using the configured parameters.
+
         Returns:
             Tuple[Maze, bool]: The constructed maze and animation status.
         """
@@ -128,6 +131,23 @@ class MazeGenerator(BaseModel):
             )
         except KeyboardInterrupt:
             raise KeyboardInterrupt
+            builder.build(
+                self.maze,
+                perfect=self.settings["PERFECT"],
+                delay=delay,
+                game_mode=self.settings.get("GAME_MODE", GameMode.BONUS).value,
+                animation=None,
+                start_cell=self.settings['ENTRY'],
+                exit_cell=self.settings['EXIT']
+            )
+            raise KeyboardInterrupt
+
+        # 3. FIX: Le garantizamos a Mypy que self.maze ya está creado
+        assert self.maze is not None
+        return self.maze
+
+    def solve(self) -> str:
+        """Calculates the shortest path solution from entry to exit.
 
         return (self._maze, animation is not None)
 
