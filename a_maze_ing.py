@@ -4,7 +4,7 @@ import os
 import select
 import sys
 from time import sleep
-from typing import Any
+from typing import Any, NoReturn
 from pydantic import ValidationError
 import game_mode
 from generator import MazeGenerator
@@ -25,7 +25,7 @@ def flush_input() -> None:
         pass
 
 
-def error_generator(msg: str) -> None:
+def error_generator(msg: str) -> NoReturn:
     """
     Show an error and finalise the execution.
     """
