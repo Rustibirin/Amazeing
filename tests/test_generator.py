@@ -4,10 +4,11 @@ from pathlib import Path
 import pytest
 from generator import MazeGenerator
 from maze import Maze
+from typing import Any
 
 
 @pytest.fixture
-def valid_settings(tmp_path: Path) -> dict[str, object]:
+def valid_settings(tmp_path: Path) -> dict[str, Any]:
     """Returns valid settings dictionary using a temporary output file."""
     return {
         "WIDTH": 10,
@@ -31,15 +32,17 @@ def test_generator_initialization(valid_settings: dict[str, object]) -> None:
     assert generator.settings == valid_settings
 
 
-def test_generator_generate(valid_settings: dict[str, object]) -> None:
+def test_generator_generate(valid_settings: dict[str, Any]) -> None:
     """Test maze generation produces a valid Maze instance."""
     generator = MazeGenerator(settings=valid_settings)
-    maze = generator.generate()
+
+    maze, animation_status = generator.generate()
 
     assert isinstance(maze, Maze)
     assert generator.maze is maze
     assert maze.width == 10
     assert maze.height == 10
+    assert animation_status is False
 
 
 def test_generator_solve(valid_settings: dict[str, object]) -> None:

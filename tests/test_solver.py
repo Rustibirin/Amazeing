@@ -3,10 +3,11 @@
 import pytest
 from maze import Maze
 from solver import Solver
+from typing import Any
 
 
 @pytest.fixture
-def small_maze_settings() -> dict[str, object]:
+def small_maze_settings() -> dict[str, Any]:
     """Returns basic settings for a 3x3 grid."""
     return {
         "WIDTH": 3,

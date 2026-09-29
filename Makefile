@@ -57,10 +57,10 @@ re: fclean all
 
 .PHONY: lint
 lint: $(VENV)
-	@echo "$(ORANGE)Running flake8..."
+	@echo "$(ORANGE)Running flake8...$(RESET)"
 	@$(VENV)/bin/flake8 . --exclude=.venv
-	@echo "$(ORANGE)Running mypy..."
-	@$(VENV)/bin/mypy . --exclude=.venv
+	@echo "$(ORANGE)Running mypy...$(RESET)"
+	@$(VENV)/bin/mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs --exclude=.venv
 	@echo "$(PURPLE)Code is clean!$(RESET)"
 
 .PHONY: lint-strict

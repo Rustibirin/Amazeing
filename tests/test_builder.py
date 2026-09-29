@@ -3,10 +3,11 @@
 import pytest
 from maze import Maze
 from builder import Builder
+from typing import Any
 
 
 @pytest.fixture
-def maze_settings() -> dict[str, object]:
+def maze_settings() -> dict[str, Any]:
     """Returns standard maze settings for testing builder logic."""
     return {
         "WIDTH": 10,

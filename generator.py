@@ -1,6 +1,6 @@
 """Reusable Maze Generator Module for external integration."""
 
-from typing import Any, Callable, Tuple
+from typing import Any, Callable
 from pydantic import BaseModel, Field, PrivateAttr, model_validator
 
 from maze import Maze
@@ -88,74 +88,62 @@ class MazeGenerator(BaseModel):
 
     @property
     def maze(self) -> Maze | None:
-        """
-        Access to read the object Maze.
-        """
-
+        """Access to read the object Maze."""
         return self._maze
 
     @property
     def solution(self) -> str | None:
-        """
-        Access to read the solution.
-        """
-
+        """Access to read the solution."""
         return self._solution
 
     def generate(
         self,
         animation: Callable[[Any, float], None] | None = None,
         delay: float = 0.0,
-    ) -> Tuple[Maze, bool]:
-        """
-        Generates the maze structure using the configured parameters.
-    ) -> Maze:
+    ) -> tuple[Maze, bool]:
         """Generates the maze structure using the configured parameters.
 
         Returns:
-            Tuple[Maze, bool]: The constructed maze and animation status.
+            tuple[Maze, bool]: The constructed maze and animation status.
         """
-
         self._maze = Maze(self.settings)
         builder = Builder(seed=self.settings.get('SEED'))
+
+        # Obtener el valor numérico/enum de GAME_MODE de forma segura
+        game_mode_attr = self.settings.get('GAME_MODE', GameMode.BONUS)
+        game_mode_val = (
+            game_mode_attr.value
+            if hasattr(game_mode_attr, 'value')
+            else game_mode_attr
+        )
 
         try:
             builder.build(
                 self._maze,
                 perfect=self.settings['PERFECT'],
                 delay=delay,
-                game_mode=self.settings.get('GAME_MODE') or GameMode.BONUS,
+                game_mode=game_mode_val,
                 animation=animation,
                 start_cell=self.settings['ENTRY'],
                 exit_cell=self.settings['EXIT']
             )
         except KeyboardInterrupt:
-            raise KeyboardInterrupt
             builder.build(
-                self.maze,
+                self._maze,
                 perfect=self.settings["PERFECT"],
                 delay=delay,
-                game_mode=self.settings.get("GAME_MODE", GameMode.BONUS).value,
+                game_mode=game_mode_val,
                 animation=None,
                 start_cell=self.settings['ENTRY'],
                 exit_cell=self.settings['EXIT']
             )
             raise KeyboardInterrupt
 
-        # 3. FIX: Le garantizamos a Mypy que self.maze ya está creado
-        assert self.maze is not None
-        return self.maze
-
-    def solve(self) -> str:
-        """Calculates the shortest path solution from entry to exit.
-
+        assert self._maze is not None
         return (self._maze, animation is not None)
 
     def solve(self) -> str:
-        """
-        Calculates the shortest path solution from entry to exit.
-        """
-
+        """Calculates the shortest path solution from entry to exit."""
         if self._maze is None:
             raise RuntimeError("Maze must be generated before solving.")
 
@@ -167,11 +155,13 @@ class MazeGenerator(BaseModel):
         """
         Exports the hex grid, coordinates, and solution path to a text file.
         """
-
         if self._maze is None or self._solution is None:
             raise RuntimeError(
                 "Maze must be generated and solved before exporting."
             )
 
-        Exporter.export(self._maze, self._solution,
-                        self.settings['OUTPUT_FILE'])
+        Exporter.export(
+            self._maze,
+            self._solution,
+            self.settings['OUTPUT_FILE']
+        )

@@ -2,10 +2,11 @@
 
 import pytest
 from maze import Maze
+from typing import Any
 
 
 @pytest.fixture
-def default_settings() -> dict[str, object]:
+def default_settings() -> dict[str, Any]:
     """Returns standard maze settings for testing."""
     return {
         "WIDTH": 10,
@@ -117,3 +118,18 @@ def test_has_42_flag_behavior() -> None:
     }
     large_maze = Maze(large_settings)
     assert large_maze.has_42 is True
+
+
+def test_easter_egg_activation() -> None:
+    """Test that easter eggs are activated on large grids (>= 90x30)."""
+    large_settings: dict[str, Any] = {
+        "WIDTH": 100,
+        "HEIGHT": 40,
+        "ENTRY": (0, 0),
+        "EXIT": (99, 39),
+        "PERFECT": True,
+    }
+    maze = Maze(large_settings)
+
+    # Verificamos que se han estampado los nombres
+    assert maze.easter_egg is True
