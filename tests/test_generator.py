@@ -21,8 +21,11 @@ def valid_settings(tmp_path: Path) -> dict[str, object]:
 
 
 def test_generator_initialization(valid_settings: dict[str, object]) -> None:
-    """Test initial state of MazeGenerator."""
-    generator = MazeGenerator(valid_settings)
+    """
+    Test initial state of MazeGenerator.
+    """
+
+    generator = MazeGenerator(settings=valid_settings)
     assert generator.maze is None
     assert generator.solution is None
     assert generator.settings == valid_settings
@@ -30,7 +33,7 @@ def test_generator_initialization(valid_settings: dict[str, object]) -> None:
 
 def test_generator_generate(valid_settings: dict[str, object]) -> None:
     """Test maze generation produces a valid Maze instance."""
-    generator = MazeGenerator(valid_settings)
+    generator = MazeGenerator(settings=valid_settings)
     maze = generator.generate()
 
     assert isinstance(maze, Maze)
@@ -41,7 +44,7 @@ def test_generator_generate(valid_settings: dict[str, object]) -> None:
 
 def test_generator_solve(valid_settings: dict[str, object]) -> None:
     """Test pathfinding solution generation after maze creation."""
-    generator = MazeGenerator(valid_settings)
+    generator = MazeGenerator(settings=valid_settings)
     generator.generate()
     solution = generator.solve()
 
@@ -54,14 +57,14 @@ def test_generator_solve_before_generate_raises_runtime_error(
     valid_settings: dict[str, object]
 ) -> None:
     """Test that calling solve() before generate() raises RuntimeError."""
-    generator = MazeGenerator(valid_settings)
+    generator = MazeGenerator(settings=valid_settings)
     with pytest.raises(RuntimeError, match="must be generated before solving"):
         generator.solve()
 
 
 def test_generator_export(valid_settings: dict[str, object]) -> None:
     """Test exporting maze to default output path."""
-    generator = MazeGenerator(valid_settings)
+    generator = MazeGenerator(settings=valid_settings)
     generator.generate()
     generator.solve()
     generator.export()
@@ -75,7 +78,7 @@ def test_generator_export_before_steps_raises_runtime_error(
     valid_settings: dict[str, object]
 ) -> None:
     """Test that exporting before generating or solving raises RuntimeError."""
-    generator = MazeGenerator(valid_settings)
+    generator = MazeGenerator(settings=valid_settings)
 
     with pytest.raises(
         RuntimeError, match="must be generated and solved before exporting"

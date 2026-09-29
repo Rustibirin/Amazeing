@@ -11,6 +11,7 @@ def _get_key() -> str:
     Captures a single key press from the standard input
     without requiring the user to press Enter.
     """
+
     fd = sys.stdin.fileno()
     terminal_settings = termios.tcgetattr(fd)
     try:
@@ -24,7 +25,10 @@ def _get_key() -> str:
 
 
 def _play_sound(file_path: str = "victory.wav") -> None:
-    """Plays a sound file."""
+    """
+    Plays a sound file.
+    """
+
     try:
         subprocess.run(["aplay", file_path], stderr=subprocess.DEVNULL)
 
@@ -36,6 +40,7 @@ def play_interactive(maze: Any) -> None:
     """
     Main loop for the interactive WASD movement mode.
     """
+
     current_x, current_y = maze.entry
 
     while True:

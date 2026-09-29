@@ -4,15 +4,16 @@ from typing import Any
 
 
 class Exporter:
-    """Handles saving the maze to a text file adhering to 42 subject specs."""
+    """
+    Handles saving the maze to a text file adhering to 42 subject specs.
+    """
 
     @staticmethod
-    def export(
-        maze: Any,
-        solution: str,
-        filepath: str,
-    ) -> None:
-        """Writes hex grid, empty line, entry, exit, and solution path."""
+    def export(maze: Any, solution: str, filepath: str) -> None:
+        """
+        Writes hex grid, empty line, entry, exit, and solution path.
+        """
+
         lines: list[str] = []
 
         for y in range(maze.height):
