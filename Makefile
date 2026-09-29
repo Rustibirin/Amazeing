@@ -76,3 +76,9 @@ test: $(VENV)
 	@echo "$(ORANGE)Running unit tests...$(GREEN)"
 	@PYTHONPATH=. $(VENV)/bin/pytest tests/ -v
 	@echo "$(PURPLE)Tests completed.$(RESET)"
+
+.PHONY: build
+build: $(VENV)
+	@echo "$(ORANGE)Building mazegen distribution files...$(GREEN)"
+	$(PYTHON) -m build > /dev/null
+	@echo "$(PURPLE)Package built successfully! Check dist/$(RESET)"

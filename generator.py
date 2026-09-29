@@ -25,7 +25,7 @@ class MazeGenerator:
         self,
         animation: Callable[[Any, float], None] | None = None,
         delay: float = 0.0,
-    ) -> (Maze, bool):
+    ) -> Maze:
         """Generates the maze structure using the configured parameters.
 
         Returns:
@@ -40,22 +40,24 @@ class MazeGenerator:
                 delay=delay,
                 game_mode=self.settings.get("GAME_MODE", GameMode.BONUS).value,
                 animation=animation,
-                start_cell=self.settings.get('ENTRY'),
-                exit_cell=self.settings.get('EXIT')
+                start_cell=self.settings['ENTRY'],
+                exit_cell=self.settings['EXIT']
             )
         except KeyboardInterrupt:
-            animation = False
             builder.build(
                 self.maze,
                 perfect=self.settings["PERFECT"],
                 delay=delay,
                 game_mode=self.settings.get("GAME_MODE", GameMode.BONUS).value,
-                animation=animation,
-                start_cell=self.settings.get('ENTRY'),
-                exit_cell=self.settings.get('EXIT')
+                animation=None,
+                start_cell=self.settings['ENTRY'],
+                exit_cell=self.settings['EXIT']
             )
             raise KeyboardInterrupt
-        return (self.maze, animation)
+
+        # 3. FIX: Le garantizamos a Mypy que self.maze ya está creado
+        assert self.maze is not None
+        return self.maze
 
     def solve(self) -> str:
         """Calculates the shortest path solution from entry to exit.
