@@ -72,14 +72,22 @@ def parse_config(path: str) -> dict[str, Any]:
 
                 key, value = clean_line.split('=', 1)
                 key, value = key.strip(), value.strip()
-
+                if key in config:
+                    print("\033c", end="", flush=True)
+                    print(f"Error: Duplicate key '{key}' in the file"
+                          f" {path} found at line"
+                          f" {num_line}", file=sys.stderr)
+                    sys.exit(1)
                 try:
                     config[key] = parse_val(value)
                 except ValueError as e:
                     text = f"Error in line {num_line} to '{key}'"
                     print(f"{text}: {e}", file=sys.stderr)
                     sys.exit(1)
-
+        if ('SEED' not in config):
+            config['SEED'] = 42
+        if ('DELAY' not in config):
+            config['DELAY'] = 0.03
     except FileNotFoundError:
         print(f"Error: File '{path}' does not exist.", file=sys.stderr)
         sys.exit(1)

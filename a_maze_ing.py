@@ -27,14 +27,14 @@ def flush_input() -> None:
 
 def error_generator(msg: str) -> NoReturn:
     """
-    Clears terminal, prints an error message to stderr, and exits the program.
+    Clear terminal, prints an error message to stderr, and exits the program.
 
     Args:
         msg: The error message to be displayed.
     """
 
-    print("\033c", end="")
-    print(msg, file=sys.stderr)
+    print("\033c", end="", flush=True)
+    print(msg, file=sys.stderr, flush=True)
     sys.exit(1)
 
 
@@ -85,7 +85,7 @@ def run_pipeline(
         solution = grid.solve()
         grid.export()
 
-        print("\033c", end="")
+        print("\033c", end="", flush=True)
         if settings.get("LIVE_MODE") and grid.maze and show_path:
             visualizer.animate_solution(
                 grid.maze,
@@ -93,7 +93,7 @@ def run_pipeline(
                 delay=settings.get("DELAY", 0.0),
             )
     except KeyboardInterrupt:
-        print("\033c", end="")
+        print("\033c", end="", flush=True)
         if grid.maze is not None:
             solution = grid.solve()
             grid.export()
@@ -125,7 +125,7 @@ def run_menu(
     while True:
         if grid.maze:
             current_path = solution if show_path else ""
-            print("\033c", end="")
+            print("\033c", end="", flush=True)
             visualizer.render_ascii(grid.maze, current_path)
             print("\n=== Show Mode ===")
             if grid.maze.small_grid:
@@ -251,8 +251,7 @@ def run_menu(
                     error_generator(ex.errors()[0]["msg"])
                 solution = run_pipeline(grid, settings, show_path)
             except Exception as e:
-                print(f"Error loading settings: {e}")
-                sleep(0.5)
+                error_generator(str(e))
 
         elif choice == "9":
             if grid.maze:
@@ -296,7 +295,7 @@ def main() -> None:
 
     config_path: str = sys.argv[1]
 
-    print("\033c", end="")
+    print("\033c", end="", flush=True)
     print("Validating configuration...")
     try:
         settings = load_settings(config_path)
@@ -309,10 +308,9 @@ def main() -> None:
         print(f"Output file: {settings['OUTPUT_FILE']}")
         if "SEED" in settings:
             print(f"Seed: {settings['SEED']}")
-
         flush_input()
         input("\nPress Enter to continue...")
-        print("\033c", end="")
+        print("\033c", end="", flush=True)
 
         try:
             grid = MazeGenerator(settings=settings)
@@ -331,7 +329,12 @@ def main() -> None:
         sys.exit(1)
 
     except KeyboardInterrupt:
-        print("\nExiting the program.")
+        print("\nExiting the program.", file=sys.stderr)
+        sys.exit(1)
+
+    except ValidationError as e:
+        print(f"Value of an invalid type: {e}", file=sys.stderr)
+        sys.exit(1)
 
     except Exception as e:
         print(f"Unexpected error: {e}", file=sys.stderr)

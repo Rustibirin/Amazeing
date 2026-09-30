@@ -23,46 +23,50 @@ class MazeGenerator(BaseModel):
 
     @model_validator(mode='after')
     def validate_types(self) -> 'MazeGenerator':
-        if (not isinstance(self.settings.get('WIDTH'), int)):
-            raise ValueError("Invalid width must be an integer.")
+        if (not (isinstance(self.settings.get('WIDTH'), int)
+                 and self.settings.get('WIDTH'))):
+            raise ValueError("Invalid 'WIDTH' must be an integer.")
 
-        if (not isinstance(self.settings.get('HEIGHT'), int)):
-            raise ValueError("Invalid height must be an integer.")
+        if (not (isinstance(self.settings.get('HEIGHT'), int)
+                 and self.settings.get('HEIGHT'))):
+            raise ValueError("Invalid 'HEIGHT' must be an integer.")
 
         if (not isinstance(self.settings.get('ENTRY'), tuple)
            or len(self.settings['ENTRY']) != 2
            or not isinstance(self.settings['ENTRY'][0], int)
            or not isinstance(self.settings['ENTRY'][1], int)):
-            raise ValueError("Invalid entry must be a tuple of two integers.")
+            raise ValueError("Invalid 'ENTRY' must be a tuple of two"
+                             " integers.")
 
         if (not isinstance(self.settings.get('EXIT'), tuple)
            or len(self.settings['EXIT']) != 2
            or not isinstance(self.settings['EXIT'][0], int)
            or not isinstance(self.settings['EXIT'][1], int)):
-            raise ValueError("Invalid exit must be a tuple of two integers.")
+            raise ValueError("Invalid 'EXIT' must be a tuple of two integers.")
 
-        if (not isinstance(self.settings.get('OUTPUT_FILE'), str)):
-            raise ValueError("The name of the output file must be a string.")
+        if (not (isinstance(self.settings.get('OUTPUT_FILE'), str)
+                 and self.settings.get('OUTPUT_FILE'))):
+            raise ValueError("The name of the 'OUTPUT_FILE' must be a string.")
 
-        if (not isinstance(self.settings.get('PERFECT'), bool)):
-            raise ValueError("Im/perfect maze must be a boolean.")
+        if (not (isinstance(self.settings.get('PERFECT'), bool)
+                 and self.settings.get('PERFECT'))):
+            raise ValueError("'PERFECT' maze must be a boolean.")
 
         if 'ALGORITHM' in self.settings:
             if not isinstance(self.settings['ALGORITHM'], str):
                 raise ValueError("ALGORITHM must be a string.")
 
-            algo = self.settings['ALGORITHM'].lower()
-            if algo not in ('wilson', 'dfs'):
+            alg = self.settings['ALGORITHM'].lower()
+            if alg not in ('wilson', 'dfs'):
                 raise ValueError("ALGORITHM must be 'wilson' or 'dfs'.")
 
-            self.settings['ALGORITHM'] = algo
+            self.settings['ALGORITHM'] = alg
 
         if 'DIFFICULTY' in self.settings:
             diff = self.settings['DIFFICULTY']
 
             if isinstance(diff, str):
                 try:
-                    # Transformamos 'easy' -> Difficulty.EASY
                     diff = Difficulty[diff.upper()]
                 except KeyError:
                     valid_diffs = ('bonus', 'easy', 'medium', 'hard', 'insane')
@@ -75,8 +79,21 @@ class MazeGenerator(BaseModel):
                     "DIFFICULTY must be a word (bonus, easy, medium, "
                     "hard, insane) or a Difficulty Enum."
                 )
-
             self.settings['DIFFICULTY'] = diff
+
+        if 'DELAY' in self.settings:
+            delay = self.settings['DELAY']
+
+            if not (isinstance(delay, (int, float))):
+                raise ValueError(f"Invalid DELAY: '{delay}'. "
+                                 "Must be a number.")
+
+        if 'SEED' in self.settings:
+            seed = self.settings['SEED']
+
+            if not (isinstance(seed, (int))):
+                raise ValueError(f"Invalid SEED: '{seed}'. "
+                                 "Must be an integer.")
 
         return self
 
@@ -96,13 +113,13 @@ class MazeGenerator(BaseModel):
         entry_cell = self.settings['ENTRY']
         exit_cell = self.settings['EXIT']
         if entry_cell == exit_cell:
-            text = "The 'entry' and 'exit' coordinates must"
+            text = "The 'ENTRY' and 'EXIT' coordinates must"
             raise ValueError(f"{text} be different.")
 
         entry_x, entry_y = entry_cell
         if not (0 <= entry_x < self.settings['WIDTH']
                 and 0 <= entry_y < self.settings['HEIGHT']):
-            msg = f"'entry' {entry_cell} is out of bounds for maze size"
+            msg = f"'ENTRY' {entry_cell} is out of bounds for maze size"
             raise ValueError(
                 f"{msg} {self.settings['WIDTH']}x{self.settings['HEIGHT']}."
             )
@@ -110,7 +127,7 @@ class MazeGenerator(BaseModel):
         exit_x, exit_y = exit_cell
         if not (0 <= exit_x < self.settings['WIDTH']
                 and 0 <= exit_y < self.settings['HEIGHT']):
-            msg = f"'exit' {exit_cell} is out of bounds for maze size"
+            msg = f"'EXIT' {exit_cell} is out of bounds for maze size"
             raise ValueError(
                 f"{msg} {self.settings['WIDTH']}x{self.settings['HEIGHT']}."
             )
