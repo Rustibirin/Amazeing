@@ -152,7 +152,7 @@ def run_menu(
                     else str(diff_val).upper()
                 )
                 print(f"Game Mode: {diff_name}")
-                print(f"Seed: {grid.maze.seed}")
+            print(f"Seed: {grid.maze.seed}")
 
         print("\n=== A-Maze-ing ===")
         print("1. Re-generate a new maze")
@@ -206,12 +206,18 @@ def run_menu(
 
         elif choice == "5":
             settings["PERFECT"] = not settings["PERFECT"]
+
+            if grid.maze and grid.maze.seed is not None:
+                settings["SEED"] = grid.maze.seed
+
             grid = MazeGenerator(settings=settings)
             solution = run_pipeline(grid, settings, show_path)
 
         elif choice == "6":
             if settings["PERFECT"]:
                 continue
+            if grid.maze and grid.maze.seed is not None:
+                settings["SEED"] = grid.maze.seed
             toggle_difficulty(settings)
             grid = MazeGenerator(settings=settings)
             solution = run_pipeline(grid, settings, show_path)
@@ -221,6 +227,10 @@ def run_menu(
                 settings["ALGORITHM"] = "dfs"
             else:
                 settings["ALGORITHM"] = "wilson"
+
+            if grid.maze and grid.maze.seed is not None:
+                settings["SEED"] = grid.maze.seed
+
             grid = MazeGenerator(settings=settings)
             solution = run_pipeline(grid, settings, show_path)
 
@@ -235,7 +245,6 @@ def run_menu(
                 settings = new_settings
                 base_settings = new_settings.copy()
                 print("Re-generating maze with new configuration...")
-                settings.pop("SEED", None)
                 try:
                     grid = MazeGenerator(settings=settings)
                 except ValidationError as ex:
