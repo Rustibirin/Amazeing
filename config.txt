@@ -8,12 +8,12 @@ EXIT=3, 3
 
 # Output file
 OUTPUT_FILE=maze.txt
-# ----> ¡¡Tener cuidado con los errores de permisos a la hora de crear el archivo!!
 
 # Generate a perfect maze
-PERFECT=True
+PERFECT=False
 
 # Optionals
 SEED=42
-#GAME_MODE=easy
+DIFFICULTY=1
 DELAY=0.1
+ALGORITHM=wilson

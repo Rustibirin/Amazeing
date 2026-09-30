@@ -10,7 +10,7 @@ import game_mode
 from generator import MazeGenerator
 import visualizer
 import parser as config_module
-from parser import GameMode
+from parser import Difficulty
 
 
 def flush_input() -> None:
@@ -38,15 +38,15 @@ def error_generator(msg: str) -> NoReturn:
     sys.exit(1)
 
 
-def toggle_game_mode(settings: dict[str, Any]) -> None:
+def toggle_difficulty(settings: dict[str, Any]) -> None:
     """
-    Cycles through the available GameModes in the settings.
+    Cycles through the available difficulties in the settings.
     """
 
-    modes = list(GameMode)
-    current_mode = settings.get("GAME_MODE", GameMode.BONUS)
+    modes = list(Difficulty)
+    current_mode = settings.get("DIFFICULTY", Difficulty.BONUS)
     next_index = (modes.index(current_mode) + 1) % len(modes)
-    settings["GAME_MODE"] = modes[next_index]
+    settings["DIFFICULTY"] = modes[next_index]
 
 
 def run_pipeline(
@@ -137,10 +137,11 @@ def run_menu(
                 print("You found the Easter Egg. Congratulations!!")
             print(f"Live Mode: {settings.get('LIVE_MODE', False)}")
             print(f"Perfect Mode: {settings['PERFECT']}")
+            print(f"Algorithm: {settings.get('ALGORITHM', 'wilson')}")
             if not settings["PERFECT"]:
                 print(
                     f"Game Mode: "
-                    f"{settings.get('GAME_MODE', GameMode.BONUS).name}"
+                    f"{settings.get('DIFFICULTY', Difficulty.BONUS).name}"
                 )
 
         print("\n=== A-Maze-ing ===")
@@ -150,15 +151,16 @@ def run_menu(
         print("4. Toggle Live Animation")
         print("5. Toggle Perfect Mode")
         print("6. Toggle Game Mode (Imperfect mode)")
-        print("7. Charge new settings")
-        print("8. PLAY MAZE!")
-        print("9. Quit")
+        print("7. Toggle Algorithm")
+        print("8. Charge new settings")
+        print("9. PLAY MAZE!")
+        print("10. Quit")
         print("\033[J")
 
         flush_input()
 
         try:
-            choice = input("Choice? (1-9): ").strip()
+            choice = input("Choice? (1-10): ").strip()
         except (KeyboardInterrupt, EOFError):
             print("\nExiting program...")
             break
@@ -200,11 +202,19 @@ def run_menu(
         elif choice == "6":
             if settings["PERFECT"]:
                 continue
-            toggle_game_mode(settings)
+            toggle_difficulty(settings)
             grid = MazeGenerator(settings=settings)
             solution = run_pipeline(grid, settings, show_path)
 
         elif choice == "7":
+            if settings.get("ALGORITHM", "wilson") == "wilson":
+                settings["ALGORITHM"] = "dfs"
+            else:
+                settings["ALGORITHM"] = "wilson"
+            grid = MazeGenerator(settings=settings)
+            solution = run_pipeline(grid, settings, show_path)
+
+        elif choice == "8":
             try:
                 new_settings = load_settings(config_path)
                 if new_settings == base_settings:
@@ -225,16 +235,16 @@ def run_menu(
                 print(f"Error loading settings: {e}")
                 sleep(0.5)
 
-        elif choice == "8":
+        elif choice == "9":
             if grid.maze:
                 game_mode.play_interactive(grid.maze)
 
-        elif choice == "9":
+        elif choice == "10":
             print("Goodbye!")
             break
 
         else:
-            print("Invalid choice. Please select an option from 1 to 9.")
+            print("Invalid choice. Please select an option from 1 to 10.")
             sleep(0.5)
 
 

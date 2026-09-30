@@ -10,7 +10,7 @@ import sys
 from typing import Any
 
 
-class GameMode(float, Enum):
+class Difficulty(float, Enum):
     """
     Maze difficulty levels mapped to dead-end removal rates.
     """
@@ -81,10 +81,10 @@ def parse_config(path: str) -> dict[str, Any]:
                     sys.exit(1)
 
     except FileNotFoundError:
-        print(f"Error: '{path}' no existe.", file=sys.stderr)
+        print(f"Error: File '{path}' does not exist.", file=sys.stderr)
         sys.exit(1)
     except PermissionError:
-        print(f"Error: No allow to read '{path}'.", file=sys.stderr)
+        print(f"Error: Permission denied to read '{path}'.", file=sys.stderr)
         sys.exit(1)
 
     return config

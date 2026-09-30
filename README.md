@@ -43,17 +43,17 @@ Full Cleanup (breaks venv): make fclean
 
 The program reads a plain text configuration file using a strict KEY=VALUE format. Empty lines and lines starting with # are ignored.
 
-| Key                      | Type    | Description                                                           | Example                |
-|--------------------------|---------|-----------------------------------------------------------------------|------------------------|
-| `WIDTH`                  | Integer | Maze width in cells (min 4).                                          | `WIDTH=20`             |
-| `HEIGHT`                 | Integer | Maze height in cells (min 4).                                         | `HEIGHT=15`            |
-| `ENTRY`                  | X, Y    | Starting coordinates.                                                 | `ENTRY=0,0`            |
-| `EXIT`                   | X, Y    | Target coordinates.                                                   | `EXIT=19,14`           |
-| `OUTPUT_FILE`            | String  | Name of the exported hex text file.                                   | `OUTPUT_FILE=maze.txt` |
-| `PERFECT`                | Boolean | `True` for a single-path maze, `False` for Pac-Man mode.              | `PERFECT=True`         |
-| `SEED` *(Optional)*      | Integer | Ensures deterministic procedural generation.                          | `SEED=42`              |
-| `GAME_MODE` *(Optional)* | String  | Dead-end removal (`Bonus`, `Easy`, `Medium`, `Hard`, `Insane`).       | `GAME_MODE=Easy`       |
-| `DELAY` *(Optional)*     | Float   | Delay in seconds for live terminal rendering.                         | `DELAY=0.05`           |
+| Key                       | Type    | Description                                                           | Example                |
+|---------------------------|---------|-----------------------------------------------------------------------|------------------------|
+| `WIDTH`                   | Integer | Maze width in cells (min 4).                                          | `WIDTH=20`             |
+| `HEIGHT`                  | Integer | Maze height in cells (min 4).                                         | `HEIGHT=15`            |
+| `ENTRY`                   | X, Y    | Starting coordinates.                                                 | `ENTRY=0,0`            |
+| `EXIT`                    | X, Y    | Target coordinates.                                                   | `EXIT=19,14`           |
+| `OUTPUT_FILE`             | String  | Name of the exported hex text file.                                   | `OUTPUT_FILE=maze.txt` |
+| `PERFECT`                 | Boolean | `True` for a single-path maze, `False` for Pac-Man mode.              | `PERFECT=True`         |
+| `SEED` *(Optional)*       | Integer | Ensures deterministic procedural generation.                          | `SEED=42`              |
+| `DIFFICULTY` *(Optional)* | String  | Dead-end removal (`Bonus`, `Easy`, `Medium`, `Hard`, `Insane`).       | `DIFFICULTY=Easy`      |
+| `DELAY` *(Optional)*      | Float   | Delay in seconds for live terminal rendering.                         | `DELAY=0.05`           |
 
 ### Maze Generation Algorithm
 
@@ -65,7 +65,7 @@ Many standard maze algorithms (like Recursive Backtracker or Prim's) introduce n
 
 ### Advanced Features
 
-Pac-Man Mode: When PERFECT=False, a post-processing algorithm traverses the perfect maze to tear down walls, open the four corners, and strategically break dead-ends based on the GAME_MODE parameter, creating multiple independent routes.
+Pac-Man Mode: When PERFECT=False, a post-processing algorithm traverses the perfect maze to tear down walls, open the four corners, and strategically break dead-ends based on the DIFFICULTY parameter, creating multiple independent routes.
 
 Embedded Templates: The generator intelligently stamps a "42" shape in the center of the maze and includes hidden easter eggs for the developers if the dimensions allow it.
 

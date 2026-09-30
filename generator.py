@@ -7,7 +7,7 @@ from maze import Maze
 from builder import Builder
 from solver import Solver
 from exporter import Exporter
-from parser import GameMode
+from parser import Difficulty
 
 
 class MazeGenerator(BaseModel):
@@ -109,12 +109,11 @@ class MazeGenerator(BaseModel):
         self._maze = Maze(self.settings)
         builder = Builder(seed=self.settings.get('SEED'))
 
-        # Obtener el valor numérico/enum de GAME_MODE de forma segura
-        game_mode_attr = self.settings.get('GAME_MODE', GameMode.BONUS)
-        game_mode_val = (
-            game_mode_attr.value
-            if hasattr(game_mode_attr, 'value')
-            else game_mode_attr
+        difficulty_attr = self.settings.get('DIFFICULTY', Difficulty.BONUS)
+        difficulty_val = (
+            difficulty_attr.value
+            if hasattr(difficulty_attr, 'value')
+            else difficulty_attr
         )
 
         try:
@@ -122,16 +121,18 @@ class MazeGenerator(BaseModel):
                 self._maze,
                 perfect=self.settings['PERFECT'],
                 delay=delay,
-                game_mode=game_mode_val,
-                animation=animation
+                difficulty=difficulty_val,
+                animation=animation,
+                algorithm=self.settings.get('ALGORITHM', 'wilson')
             )
         except KeyboardInterrupt:
             builder.build(
                 self._maze,
                 perfect=self.settings["PERFECT"],
                 delay=delay,
-                game_mode=game_mode_val,
-                animation=None
+                difficulty=difficulty_val,
+                animation=None,
+                algorithm=self.settings.get('ALGORITHM', 'wilson')
             )
             raise KeyboardInterrupt
 

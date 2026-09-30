@@ -31,8 +31,9 @@ class Builder:
         maze: Any,
         perfect: bool,
         delay: float,
-        game_mode: float | Any = 1,
-        animation: Callable[[Any, float], None] | None = None
+        difficulty: float | Any = 1,
+        animation: Callable[[Any, float], None] | None = None,
+        algorithm: str = "wilson"
     ) -> None:
         """
         Executes the maze generation pipeline.
@@ -44,7 +45,7 @@ class Builder:
             maze: The maze grid object to be constructed.
             perfect: If True, generates a perfect maze; otherwise adds loops.
             delay: Delay in seconds between rendering animation steps.
-            game_mode: Intensity factor for breaking walls in non-perfect mode.
+            difficulty: Factor to breaking walls in non-perfect mode.
             animation: Optional callback for step-by-step rendering.
             start_cell: Coordinates of the entry cell.
             exit_cell: Coordinates of the exit cell.
@@ -56,10 +57,13 @@ class Builder:
         self._delay = delay
         self._was_interrupted = False
 
-        self._create_perfect_maze(maze)
+        if algorithm == "wilson":
+            self._perfect_maze_by_wilson(maze)
+        else:
+            self._perfect_maze_by_DFS(maze)
 
         if not perfect:
-            self._pacman_mode(maze, game_mode)
+            self._pacman_mode(maze, difficulty)
 
         if self._was_interrupted:
             raise KeyboardInterrupt
@@ -80,7 +84,7 @@ class Builder:
                 self._delay = 0.0
                 self._was_interrupted = True
 
-    def _create_perfect_maze(self, maze: Any) -> None:
+    def _perfect_maze_by_wilson(self, maze: Any) -> None:
         """
         Generates a perfect maze with no loops using Wilson's algorithm.
 
@@ -159,16 +163,58 @@ class Builder:
 
                 cell_ptr = next_cell
 
-    def _pacman_mode(self, maze: Any, game_mode: float) -> None:
+    def _perfect_maze_by_DFS(self, maze: Any) -> None:
+        """
+        Generates a perfect maze with no loops
+        using an Iterative Depth-First Search.
+
+        Args:
+            maze: The maze grid object to alter.
+        """
+        start_cell = maze.entry
+        visited: set[tuple[int, int]] = {start_cell}
+
+        maze.mark_in_maze(start_cell[0], start_cell[1])
+        stack: list[tuple[int, int]] = [start_cell]
+
+        while stack:
+            current_x, current_y = stack[-1]
+
+            unvisited_neighbors = []
+            for move_x, move_y, bit, opp_bit in maze.DIR_MAP.values():
+                next_x, next_y = current_x + move_x, current_y + move_y
+                if (
+                    maze.in_grid(next_x, next_y)
+                    and (next_x, next_y) not in visited
+                    and not maze.is_solid(next_x, next_y)
+                ):
+                    unvisited_neighbors.append((next_x, next_y, bit, opp_bit))
+
+            if unvisited_neighbors:
+                next_x, next_y, bit, opp_bit = random.choice(
+                    unvisited_neighbors
+                )
+                maze.break_wall(
+                    current_x, current_y, bit, opp_bit, next_x, next_y
+                )
+
+                maze.mark_in_maze(next_x, next_y)
+                visited.add((next_x, next_y))
+                stack.append((next_x, next_y))
+                self._render_step(maze)
+            else:
+                stack.pop()
+
+    def _pacman_mode(self, maze: Any, difficulty: float) -> None:
         """
         Transforms a perfect maze into an imperfect maze by adding loops.
 
         Args:
             maze: The maze grid object.
-            game_mode: Imperfection multiplier affecting wall removal density.
+            difficulty: Imperfection multiplier affecting wall removal density.
         """
         self._open_corners(maze)
-        self._break_dead_ends(maze, game_mode)
+        self._break_dead_ends(maze, difficulty)
 
     def _open_corners(self, maze: Any) -> None:
         """
@@ -196,14 +242,14 @@ class Builder:
                             maze.break_wall(x, y, bit, opp_bit, next_x, next_y)
                             self._render_step(maze)
 
-    def _break_dead_ends(self, maze: Any, game_mode: float) -> None:
+    def _break_dead_ends(self, maze: Any, difficulty: float) -> None:
         """
         Removes random walls from dead ends
         based on game mode ratio to introduce loops.
 
         Args:
             maze: The maze grid object.
-            game_mode: Ratio (0.0 to 1.0) of dead ends to break.
+            difficulty: Ratio (0.0 to 1.0) of dead ends to break.
         """
         dead_ends: list[Tuple[int, int]] = []
 
@@ -221,7 +267,7 @@ class Builder:
                     dead_ends.append((x, y))
 
         random.shuffle(dead_ends)
-        ends_to_break = int(len(dead_ends) * game_mode)
+        ends_to_break = int(len(dead_ends) * difficulty)
         targets = dead_ends[0:ends_to_break]
 
         for current_x, current_y in targets:
