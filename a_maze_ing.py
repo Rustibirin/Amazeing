@@ -45,6 +45,13 @@ def toggle_difficulty(settings: dict[str, Any]) -> None:
 
     modes = list(Difficulty)
     current_mode = settings.get("DIFFICULTY", Difficulty.BONUS)
+
+    if isinstance(current_mode, str):
+        try:
+            current_mode = Difficulty[current_mode.upper()]
+        except KeyError:
+            current_mode = Difficulty.BONUS
+
     next_index = (modes.index(current_mode) + 1) % len(modes)
     settings["DIFFICULTY"] = modes[next_index]
 
@@ -139,10 +146,13 @@ def run_menu(
             print(f"Perfect Mode: {settings['PERFECT']}")
             print(f"Algorithm: {settings.get('ALGORITHM', 'wilson')}")
             if not settings["PERFECT"]:
-                print(
-                    f"Game Mode: "
-                    f"{settings.get('DIFFICULTY', Difficulty.BONUS).name}"
+                diff_val = settings.get('DIFFICULTY', Difficulty.BONUS)
+                diff_name = (
+                    diff_val.name if hasattr(diff_val, 'name')
+                    else str(diff_val).upper()
                 )
+                print(f"Game Mode: {diff_name}")
+                print(f"Seed: {grid.maze.seed}")
 
         print("\n=== A-Maze-ing ===")
         print("1. Re-generate a new maze")
@@ -150,7 +160,7 @@ def run_menu(
         print("3. Rotate wall colours")
         print("4. Toggle Live Animation")
         print("5. Toggle Perfect Mode")
-        print("6. Toggle Game Mode (Imperfect mode)")
+        print("6. Toggle Difficulty (Only imperfect mode)")
         print("7. Toggle Algorithm")
         print("8. Charge new settings")
         print("9. PLAY MAZE!")

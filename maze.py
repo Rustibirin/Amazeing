@@ -46,6 +46,7 @@ class Maze:
         self.small_grid: bool = False
         self.has_42: bool = False
         self.easter_egg: bool = False
+        self.seed: int | None = settings.get("SEED")
         self._apply_templates()
 
     def _build_initial_matrix(self) -> list[list[int]]:

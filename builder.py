@@ -53,6 +53,7 @@ class Builder:
         Raises:
             KeyboardInterrupt: If generation was interrupted by user input.
         """
+        maze.seed = self.seed
         self._animation = animation
         self._delay = delay
         self._was_interrupted = False

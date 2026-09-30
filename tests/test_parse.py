@@ -106,3 +106,63 @@ def test_validate_config_same_entry_exit() -> None:
     }
     with pytest.raises(ValidationError, match="must be different"):
         MazeGenerator(settings=same_cell)
+
+
+def test_validate_config_invalid_algorithm() -> None:
+    """Test validation when ALGORITHM is provided but not supported."""
+    invalid_algo = {
+        "WIDTH": 10,
+        "HEIGHT": 10,
+        "ENTRY": (0, 0),
+        "EXIT": (9, 9),
+        "OUTPUT_FILE": "out.txt",
+        "PERFECT": True,
+        "ALGORITHM": "astar",  # Algoritmo inválido
+    }
+    with pytest.raises(ValidationError, match="must be 'wilson' or 'dfs'"):
+        MazeGenerator(settings=invalid_algo)
+
+
+def test_validate_config_invalid_algorithm_type() -> None:
+    """Test validation when ALGORITHM is not a string."""
+    invalid_algo_type = {
+        "WIDTH": 10,
+        "HEIGHT": 10,
+        "ENTRY": (0, 0),
+        "EXIT": (9, 9),
+        "OUTPUT_FILE": "out.txt",
+        "PERFECT": True,
+        "ALGORITHM": 42,  # Debe ser un string
+    }
+    with pytest.raises(ValidationError, match="must be a string"):
+        MazeGenerator(settings=invalid_algo_type)
+
+
+def test_validate_config_valid_algorithm_uppercase() -> None:
+    """Test validation normalizes uppercase algorithms correctly."""
+    valid_algo = {
+        "WIDTH": 10,
+        "HEIGHT": 10,
+        "ENTRY": (0, 0),
+        "EXIT": (9, 9),
+        "OUTPUT_FILE": "out.txt",
+        "PERFECT": True,
+        "ALGORITHM": "DFS",  # Mayúsculas, debería normalizarse
+    }
+    generator = MazeGenerator(settings=valid_algo)
+    assert generator.settings["ALGORITHM"] == "dfs"
+
+
+def test_validate_config_invalid_difficulty() -> None:
+    """Test validation when DIFFICULTY is provided but invalid."""
+    invalid_difficulty = {
+        "WIDTH": 10,
+        "HEIGHT": 10,
+        "ENTRY": (0, 0),
+        "EXIT": (9, 9),
+        "OUTPUT_FILE": "out.txt",
+        "PERFECT": True,
+        "DIFFICULTY": "impossible",  # Dificultad no soportada
+    }
+    with pytest.raises(ValidationError, match="Must be one of"):
+        MazeGenerator(settings=invalid_difficulty)

@@ -47,6 +47,37 @@ class MazeGenerator(BaseModel):
         if (not isinstance(self.settings.get('PERFECT'), bool)):
             raise ValueError("Im/perfect maze must be a boolean.")
 
+        if 'ALGORITHM' in self.settings:
+            if not isinstance(self.settings['ALGORITHM'], str):
+                raise ValueError("ALGORITHM must be a string.")
+
+            algo = self.settings['ALGORITHM'].lower()
+            if algo not in ('wilson', 'dfs'):
+                raise ValueError("ALGORITHM must be 'wilson' or 'dfs'.")
+
+            self.settings['ALGORITHM'] = algo
+
+        if 'DIFFICULTY' in self.settings:
+            diff = self.settings['DIFFICULTY']
+
+            if isinstance(diff, str):
+                try:
+                    # Transformamos 'easy' -> Difficulty.EASY
+                    diff = Difficulty[diff.upper()]
+                except KeyError:
+                    valid_diffs = ('bonus', 'easy', 'medium', 'hard', 'insane')
+                    raise ValueError(
+                        f"Invalid DIFFICULTY '{diff}'. Must be one of: "
+                        f"{valid_diffs}"
+                    )
+            elif not isinstance(diff, Difficulty):
+                raise ValueError(
+                    "DIFFICULTY must be a word (bonus, easy, medium, "
+                    "hard, insane) or a Difficulty Enum."
+                )
+
+            self.settings['DIFFICULTY'] = diff
+
         return self
 
     _maze: Maze | None = PrivateAttr(default=None)
