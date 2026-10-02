@@ -144,7 +144,7 @@ def run_menu(
                 print("You found the Easter Egg. Congratulations!!")
             print(f"Live Mode: {settings.get('LIVE_MODE', False)}")
             print(f"Perfect Mode: {settings['PERFECT']}")
-            print(f"Algorithm: {settings.get('ALGORITHM', 'wilson')}")
+            print(f"Algorithm: {settings.get('ALGORITHM', 'WILSON')}")
             if not settings["PERFECT"]:
                 diff_val = settings.get('DIFFICULTY', Difficulty.BONUS)
                 diff_name = (
@@ -160,7 +160,10 @@ def run_menu(
         print("3. Rotate wall colours")
         print("4. Toggle Live Animation")
         print("5. Toggle Perfect Mode")
-        print("6. Toggle Difficulty (Only imperfect mode)")
+        if settings["PERFECT"]:
+            print("\033[9m6. Toggle Difficulty\033[0m")
+        else:
+            print("6. Toggle Difficulty")
         print("7. Toggle Algorithm")
         print("8. Charge new settings")
         print("9. PLAY MAZE!")
@@ -215,6 +218,8 @@ def run_menu(
 
         elif choice == "6":
             if settings["PERFECT"]:
+                print("\nWarning: Perfect mode activated.")
+                sleep(0.5)
                 continue
             if grid.maze and grid.maze.seed is not None:
                 settings["SEED"] = grid.maze.seed
@@ -223,10 +228,10 @@ def run_menu(
             solution = run_pipeline(grid, settings, show_path)
 
         elif choice == "7":
-            if settings.get("ALGORITHM", "wilson") == "wilson":
-                settings["ALGORITHM"] = "dfs"
+            if settings.get("ALGORITHM", "WILSON") == "WILSON":
+                settings["ALGORITHM"] = "DFS"
             else:
-                settings["ALGORITHM"] = "wilson"
+                settings["ALGORITHM"] = "WILSON"
 
             if grid.maze and grid.maze.seed is not None:
                 settings["SEED"] = grid.maze.seed
@@ -243,13 +248,15 @@ def run_menu(
                     continue
 
                 settings = new_settings
-                base_settings = new_settings.copy()
                 print("Re-generating maze with new configuration...")
                 try:
                     grid = MazeGenerator(settings=settings)
+                    base_settings = new_settings.copy()
+                    solution = run_pipeline(grid, settings, show_path)
                 except ValidationError as ex:
-                    error_generator(ex.errors()[0]["msg"])
-                solution = run_pipeline(grid, settings, show_path)
+                    print(f"\nConfiguration error: {ex.errors()[0]["msg"]}")
+                    settings = base_settings.copy()
+                    input("\nPress Enter to continue...")
             except Exception as e:
                 error_generator(str(e))
 
@@ -330,10 +337,6 @@ def main() -> None:
 
     except KeyboardInterrupt:
         print("\nExiting the program.", file=sys.stderr)
-        sys.exit(1)
-
-    except ValidationError as e:
-        print(f"Value of an invalid type: {e}", file=sys.stderr)
         sys.exit(1)
 
     except Exception as e:

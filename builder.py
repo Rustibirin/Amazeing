@@ -33,7 +33,7 @@ class Builder:
         delay: float,
         difficulty: float | Any = 1,
         animation: Callable[[Any, float], None] | None = None,
-        algorithm: str = "wilson"
+        algorithm: str = "WILSON"
     ) -> None:
         """
         Executes the maze generation pipeline.
@@ -58,8 +58,8 @@ class Builder:
         self._delay = delay
         self._was_interrupted = False
 
-        if algorithm == "wilson":
-            self._perfect_maze_by_wilson(maze)
+        if algorithm == "WILSON":
+            self._perfect_maze_by_WILSON(maze)
         else:
             self._perfect_maze_by_DFS(maze)
 
@@ -85,7 +85,7 @@ class Builder:
                 self._delay = 0.0
                 self._was_interrupted = True
 
-    def _perfect_maze_by_wilson(self, maze: Any) -> None:
+    def _perfect_maze_by_WILSON(self, maze: Any) -> None:
         """
         Generates a perfect maze with no loops using Wilson's algorithm.
 

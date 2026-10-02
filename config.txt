@@ -10,10 +10,10 @@ EXIT=19, 20
 OUTPUT_FILE=maze.txt
 
 # Generate a perfect maze
-PERFECT=False
+PERFECT=true
 
 # Optionals
-SEED=55
+SEED=42
 DIFFICULTY=hard
 DELAY=0.03
-ALGORITHM=wilson
+ALGORITHM=dfs

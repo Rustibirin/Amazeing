@@ -27,9 +27,9 @@ def parse_val(val: str) -> Any:
     Parse basic types and tuples of points.
     """
 
-    if val in ("True", "true"):
+    if val == "TRUE":
         return True
-    if val in ("False", "false"):
+    if val == "FALSE":
         return False
 
     if "," in val:
@@ -72,6 +72,10 @@ def parse_config(path: str) -> dict[str, Any]:
 
                 key, value = clean_line.split('=', 1)
                 key, value = key.strip(), value.strip()
+                if isinstance(value, str) and key in (
+                    "PERFECT", "DIFFICULTY", "ALGORITHM"
+                ):
+                    value = value.upper()
                 if key in config:
                     print("\033c", end="", flush=True)
                     print(f"Error: Duplicate key '{key}' in the file"

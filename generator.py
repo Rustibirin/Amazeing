@@ -48,19 +48,18 @@ class MazeGenerator(BaseModel):
                  and self.settings.get('OUTPUT_FILE'))):
             raise ValueError("The name of the 'OUTPUT_FILE' must be a string.")
 
-        if (not (isinstance(self.settings.get('PERFECT'), bool)
-                 and self.settings.get('PERFECT'))):
+        if not isinstance(self.settings.get('PERFECT'), bool):
             raise ValueError("'PERFECT' maze must be a boolean.")
 
         if 'ALGORITHM' in self.settings:
             if not isinstance(self.settings['ALGORITHM'], str):
                 raise ValueError("ALGORITHM must be a string.")
 
-            alg = self.settings['ALGORITHM'].lower()
-            if alg not in ('wilson', 'dfs'):
-                raise ValueError("ALGORITHM must be 'wilson' or 'dfs'.")
+            val_algorithm = self.settings['ALGORITHM'].upper()
+            if val_algorithm not in ('WILSON', 'DFS'):
+                raise ValueError("ALGORITHM must be 'WILSON' or 'DFS'.")
 
-            self.settings['ALGORITHM'] = alg
+            self.settings['ALGORITHM'] = val_algorithm
 
         if 'DIFFICULTY' in self.settings:
             diff = self.settings['DIFFICULTY']
@@ -171,7 +170,7 @@ class MazeGenerator(BaseModel):
                 delay=delay,
                 difficulty=difficulty_val,
                 animation=animation,
-                algorithm=self.settings.get('ALGORITHM', 'wilson')
+                algorithm=self.settings.get('ALGORITHM', 'WILSON').upper()
             )
         except KeyboardInterrupt:
             builder.build(
@@ -180,7 +179,7 @@ class MazeGenerator(BaseModel):
                 delay=delay,
                 difficulty=difficulty_val,
                 animation=None,
-                algorithm=self.settings.get('ALGORITHM', 'wilson')
+                algorithm=self.settings.get('ALGORITHM', 'WILSON').upper()
             )
             raise KeyboardInterrupt
 

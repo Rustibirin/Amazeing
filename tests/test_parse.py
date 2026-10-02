@@ -119,7 +119,7 @@ def test_validate_config_invalid_algorithm() -> None:
         "PERFECT": True,
         "ALGORITHM": "astar",  # Algoritmo inválido
     }
-    with pytest.raises(ValidationError, match="must be 'wilson' or 'dfs'"):
+    with pytest.raises(ValidationError, match="must be 'WILSON' or 'DFS'"):
         MazeGenerator(settings=invalid_algo)
 
 
@@ -150,7 +150,7 @@ def test_validate_config_valid_algorithm_uppercase() -> None:
         "ALGORITHM": "DFS",  # Mayúsculas, debería normalizarse
     }
     generator = MazeGenerator(settings=valid_algo)
-    assert generator.settings["ALGORITHM"] == "dfs"
+    assert generator.settings["ALGORITHM"] == "DFS"
 
 
 def test_validate_config_invalid_difficulty() -> None:
