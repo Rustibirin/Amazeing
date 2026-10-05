@@ -254,7 +254,7 @@ def run_menu(
                     base_settings = new_settings.copy()
                     solution = run_pipeline(grid, settings, show_path)
                 except ValidationError as ex:
-                    print(f"\nConfiguration error: {ex.errors()[0]["msg"]}")
+                    print(f"\nConfiguration error: {ex.errors()[0]['msg']}")
                     settings = base_settings.copy()
                     input("\nPress Enter to continue...")
             except Exception as e:
