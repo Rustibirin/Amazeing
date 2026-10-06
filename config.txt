@@ -1,19 +1,19 @@
 # Maze dimensions
-WIDTH=5
-HEIGHT=5
+WIDTH=30
+HEIGHT=30
 
 # Maze entry and exit coordinates
 ENTRY=0, 0
-EXIT=4, 4
+EXIT=29, 24
 
 # Output file
 OUTPUT_FILE=maze.txt
 
 # Generate a perfect maze
-PERFECT=true
+PERFECT=false
 
 # Optionals
-SEED=42
+SEED=55
 DIFFICULTY=hard
-DELAY=0.03
-ALGORITHM=dfs
+DELAY=0.02
+ALGORITHM=wilson

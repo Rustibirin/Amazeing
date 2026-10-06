@@ -47,8 +47,7 @@ class Builder:
             delay: Delay in seconds between rendering animation steps.
             difficulty: Factor to breaking walls in non-perfect mode.
             animation: Optional callback for step-by-step rendering.
-            start_cell: Coordinates of the entry cell.
-            exit_cell: Coordinates of the exit cell.
+            algorithm: The maze generation algorithm to use.
 
         Raises:
             KeyboardInterrupt: If generation was interrupted by user input.

@@ -313,8 +313,7 @@ def main() -> None:
         print(f"Entry: {settings['ENTRY']} | Exit: {settings['EXIT']}")
         print(f"Perfect Mode: {settings['PERFECT']}")
         print(f"Output file: {settings['OUTPUT_FILE']}")
-        if "SEED" in settings:
-            print(f"Seed: {settings['SEED']}")
+        print(f"Seed: {settings['SEED']}")
         flush_input()
         input("\nPress Enter to continue...")
         print("\033c", end="", flush=True)

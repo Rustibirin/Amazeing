@@ -28,7 +28,6 @@ class Exporter:
         """
         path = Path(filepath)
 
-        # Crea los directorios padre si no existen previamente
         if path.parent:
             path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -37,7 +36,7 @@ class Exporter:
         for y in range(maze.height):
             row: list[str] = []
             for x in range(maze.width):
-                wall_mask = maze.get_wall_mask(x, y) & 0xF
+                wall_mask = maze.get_wall_mask(x, y)
                 row.append(f"{wall_mask:X}")
             lines.append("".join(row))
 

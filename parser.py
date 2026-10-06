@@ -33,14 +33,22 @@ def parse_val(val: str) -> Any:
         return False
 
     if "," in val:
-        parts = [p.strip() for p in val.split(",")]
-        if len(parts) == 2 and all(p.isdigit() or (p.startswith('-')
-           and p[1:].isdigit()) for p in parts):
-            return (int(parts[0]), int(parts[1]))
+        parts = val.split(",")
+
+        if len(parts) == 2:
+            try:
+                x = int(parts[0])
+                y = int(parts[1])
+                return (x, y)
+            except ValueError:
+                pass
+
         raise ValueError(f"Invalid tuple format: {val}")
 
-    if val.isdigit() or (val.startswith('-') and val[1:].isdigit()):
+    try:
         return int(val)
+    except ValueError:
+        pass
 
     try:
         return float(val)
@@ -89,9 +97,13 @@ def parse_config(path: str) -> dict[str, Any]:
                     print(f"{text}: {e}", file=sys.stderr)
                     sys.exit(1)
         if ('SEED' not in config):
-            config['SEED'] = 42
+            config['SEED'] = None
         if ('DELAY' not in config):
             config['DELAY'] = 0.03
+        if ('ALGORITHM' not in config):
+            config['ALGORITHM'] = "WILSON"
+        if ('DIFFICULTY' not in config):
+            config['DIFFICULTY'] = Difficulty.BONUS
     except FileNotFoundError:
         print(f"Error: File '{path}' does not exist.", file=sys.stderr)
         sys.exit(1)

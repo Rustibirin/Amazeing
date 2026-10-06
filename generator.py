@@ -23,26 +23,21 @@ class MazeGenerator(BaseModel):
 
     @model_validator(mode='after')
     def validate_types(self) -> 'MazeGenerator':
-        if (not (isinstance(self.settings.get('WIDTH'), int)
-                 and self.settings.get('WIDTH'))):
-            raise ValueError("Invalid 'WIDTH' must be an integer.")
 
-        if (not (isinstance(self.settings.get('HEIGHT'), int)
-                 and self.settings.get('HEIGHT'))):
-            raise ValueError("Invalid 'HEIGHT' must be an integer.")
+        for key in ('WIDTH', 'HEIGHT'):
+            val = self.settings.get(key)
+            if not (isinstance(val, int) and val):
+                raise ValueError(f"Invalid '{key}': Must be an integer.")
 
-        if (not isinstance(self.settings.get('ENTRY'), tuple)
-           or len(self.settings['ENTRY']) != 2
-           or not isinstance(self.settings['ENTRY'][0], int)
-           or not isinstance(self.settings['ENTRY'][1], int)):
-            raise ValueError("Invalid 'ENTRY' must be a tuple of two"
-                             " integers.")
-
-        if (not isinstance(self.settings.get('EXIT'), tuple)
-           or len(self.settings['EXIT']) != 2
-           or not isinstance(self.settings['EXIT'][0], int)
-           or not isinstance(self.settings['EXIT'][1], int)):
-            raise ValueError("Invalid 'EXIT' must be a tuple of two integers.")
+        for key in ('ENTRY', 'EXIT'):
+            val = self.settings.get(key)
+            if (not isinstance(val, tuple)
+               or len(val) != 2
+               or not isinstance(val[0], int)
+               or not isinstance(val[1], int)):
+                raise ValueError(
+                    f"Invalid '{key}': Must be a tuple of two integers."
+                )
 
         if (not (isinstance(self.settings.get('OUTPUT_FILE'), str)
                  and self.settings.get('OUTPUT_FILE'))):
@@ -76,23 +71,23 @@ class MazeGenerator(BaseModel):
             elif not isinstance(diff, Difficulty):
                 raise ValueError(
                     "DIFFICULTY must be a word (bonus, easy, medium, "
-                    "hard, insane) or a Difficulty Enum."
+                    "hard, insane)."
                 )
             self.settings['DIFFICULTY'] = diff
 
         if 'DELAY' in self.settings:
             delay = self.settings['DELAY']
 
-            if not (isinstance(delay, (int, float))):
+            if not isinstance(delay, (int, float)):
                 raise ValueError(f"Invalid DELAY: '{delay}'. "
-                                 "Must be a number.")
+                                 "Must be int or float.")
 
         if 'SEED' in self.settings:
             seed = self.settings['SEED']
 
-            if not (isinstance(seed, (int))):
+            if not isinstance(seed, int):
                 raise ValueError(f"Invalid SEED: '{seed}'. "
-                                 "Must be an integer.")
+                                 "Must be int.")
 
         return self
 
@@ -104,32 +99,27 @@ class MazeGenerator(BaseModel):
         """
         Validate dinamically the coordinates and sizes.
         """
+        width = self.settings['WIDTH']
+        height = self.settings['HEIGHT']
 
-        if (self.settings['WIDTH'] < 4 or self.settings['HEIGHT'] < 4):
-            msg: str = "The width and height of the maze must be at least 4"
-            raise ValueError(f"{msg} cells for each dimension.")
-
-        entry_cell = self.settings['ENTRY']
-        exit_cell = self.settings['EXIT']
-        if entry_cell == exit_cell:
-            text = "The 'ENTRY' and 'EXIT' coordinates must"
-            raise ValueError(f"{text} be different.")
-
-        entry_x, entry_y = entry_cell
-        if not (0 <= entry_x < self.settings['WIDTH']
-                and 0 <= entry_y < self.settings['HEIGHT']):
-            msg = f"'ENTRY' {entry_cell} is out of bounds for maze size"
+        if width < 4 or height < 4:
             raise ValueError(
-                f"{msg} {self.settings['WIDTH']}x{self.settings['HEIGHT']}."
+                "The width and height of the maze must be at least 4 "
+                "cells for each dimension."
             )
 
-        exit_x, exit_y = exit_cell
-        if not (0 <= exit_x < self.settings['WIDTH']
-                and 0 <= exit_y < self.settings['HEIGHT']):
-            msg = f"'EXIT' {exit_cell} is out of bounds for maze size"
+        if self.settings['ENTRY'] == self.settings['EXIT']:
             raise ValueError(
-                f"{msg} {self.settings['WIDTH']}x{self.settings['HEIGHT']}."
+                "The 'ENTRY' and 'EXIT' coordinates must be different."
             )
+
+        for key in ('ENTRY', 'EXIT'):
+            x, y = self.settings[key]
+            if not (0 <= x < width and 0 <= y < height):
+                raise ValueError(
+                    f"'{key}' {(x, y)} is out of bounds for maze size "
+                    f"{width}x{height}."
+                )
 
         return self
 
@@ -154,14 +144,8 @@ class MazeGenerator(BaseModel):
             tuple[Maze, bool]: The constructed maze and animation status.
         """
         self._maze = Maze(self.settings)
-        builder = Builder(seed=self.settings.get('SEED'))
-
-        difficulty_attr = self.settings.get('DIFFICULTY', Difficulty.BONUS)
-        difficulty_val = (
-            difficulty_attr.value
-            if hasattr(difficulty_attr, 'value')
-            else difficulty_attr
-        )
+        builder = Builder(seed=self.settings.get('SEED', None))
+        difficulty_val = self.settings.get("DIFFICULTY", Difficulty.BONUS)
 
         try:
             builder.build(
@@ -170,7 +154,7 @@ class MazeGenerator(BaseModel):
                 delay=delay,
                 difficulty=difficulty_val,
                 animation=animation,
-                algorithm=self.settings.get('ALGORITHM', 'WILSON').upper()
+                algorithm=self.settings.get("ALGORITHM", "WILSON")
             )
         except KeyboardInterrupt:
             builder.build(
@@ -179,7 +163,7 @@ class MazeGenerator(BaseModel):
                 delay=delay,
                 difficulty=difficulty_val,
                 animation=None,
-                algorithm=self.settings.get('ALGORITHM', 'WILSON').upper()
+                algorithm=self.settings.get("ALGORITHM", "WILSON")
             )
             raise KeyboardInterrupt
 

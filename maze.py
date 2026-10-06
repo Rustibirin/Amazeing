@@ -41,12 +41,12 @@ class Maze:
         self.height: int = settings["HEIGHT"]
         self.entry: tuple[int, int] = settings["ENTRY"]
         self.exit: tuple[int, int] = settings["EXIT"]
+        self.seed: int = settings.get("SEED", 42)
 
         self.matrix: list[list[int]] = self._build_initial_matrix()
         self.small_grid: bool = False
         self.has_42: bool = False
         self.easter_egg: bool = False
-        self.seed: int | None = settings.get("SEED")
         self._apply_templates()
 
     def _build_initial_matrix(self) -> list[list[int]]:
@@ -122,21 +122,21 @@ class Maze:
 
     def get_wall_mask(self, x: int, y: int) -> int:
         """
-        Return the decimal number depending of the walls which are up.
+        Return the decimal number depending on the walls which are up.
         """
 
         return self.matrix[y][x] & self.ALL_WALLS_MASK
 
     def has_wall(self, x: int, y: int, wall_bit: int) -> bool:
         """
-        Return True or False depending if a cell has a wall in a direction.
+        Return True or False if a cell has a wall in a direction.
         """
 
         return bool(self.matrix[y][x] & wall_bit)
 
     def _break_partition(self, x: int, y: int, wall_bit: int) -> None:
         """
-        Invert a bit in an specific cell to destroy its wall.
+        Invert a bit in a specific cell to destroy its wall.
         """
 
         self.matrix[y][x] &= ~wall_bit
@@ -151,7 +151,7 @@ class Maze:
         next_y: int | None = None
     ) -> None:
         """
-        Its called to break a wall in the maze by changing a specific bit.
+        It's called to break a wall in the maze by changing a specific bit.
         """
 
         self._break_partition(x, y, bit)
@@ -165,7 +165,7 @@ class Maze:
 
     def _get_center(self, symbol: list[list[int]]) -> tuple[int, int]:
         """
-        Defines the coordinates where is represented the center.
+        Calculates the top-left coordinates to center a symbol within the maze.
         """
 
         symbol_height = len(symbol)
@@ -177,7 +177,7 @@ class Maze:
 
     def _get_bottom_left(self, symbol: list[list[int]]) -> tuple[int, int]:
         """
-        Defines the coordinates where is represented the bottom left
+        Calculates the coordinates to place a symbol at the bottom-left.
         """
 
         symbol_height = len(symbol)
@@ -187,7 +187,7 @@ class Maze:
 
     def _get_bottom_right(self, symbol: list[list[int]]) -> tuple[int, int]:
         """
-        Defines the coordinates where is represented the bottom right.
+        Calculates the coordinates to place a symbol at the bottom-right.
         """
 
         symbol_height = len(symbol)
