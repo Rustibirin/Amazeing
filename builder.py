@@ -1,7 +1,8 @@
 """Maze generation and pathfinding engine."""
 
 import random
-from typing import Any, Callable, Dict, Tuple
+
+from typing import Any, Callable
 
 
 class Builder:
@@ -93,7 +94,7 @@ class Builder:
         """
         start_cell = maze.entry
         exit_cell = maze.exit
-        valid_grid: list[Tuple[int, int]] = [
+        valid_grid: list[tuple[int, int]] = [
             (x, y)
             for x in range(maze.width)
             for y in range(maze.height)
@@ -127,7 +128,7 @@ class Builder:
 
             current = walk_start
 
-            walk: Dict[Tuple[int, int], Tuple[Tuple[int, int], int, int]] = {}
+            walk: dict[tuple[int, int], tuple[tuple[int, int], int, int]] = {}
 
             while not maze.in_maze(current[0], current[1]):
                 current_x, current_y = current
@@ -251,7 +252,7 @@ class Builder:
             maze: The maze grid object.
             difficulty: Ratio (0.0 to 1.0) of dead ends to break.
         """
-        dead_ends: list[Tuple[int, int]] = []
+        dead_ends: list[tuple[int, int]] = []
 
         for y in range(maze.height):
             for x in range(maze.width):

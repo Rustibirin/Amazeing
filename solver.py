@@ -1,6 +1,7 @@
 """Maze Pathfinding Solver Module."""
 
 from collections import deque
+
 from typing import Any
 
 

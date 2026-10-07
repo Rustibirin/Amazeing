@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
-
 """
 This script receives a configuration file, validates it,
 and prepares the environment for maze generation.
 """
 
-from enum import Enum
 import sys
+from enum import Enum
+
 from typing import Any
 
 

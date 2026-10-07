@@ -1,4 +1,7 @@
+"""Maze data structure and bitwise state management."""
+
 from typing import Any
+
 from templates import TEMPLATES
 
 

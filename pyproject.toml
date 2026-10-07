@@ -27,7 +27,7 @@ py-modules = [
     "builder",
     "parser",
     "exporter",
-    "game_mode",
+    "play_mode",
     "generator",
     "maze",
     "solver",

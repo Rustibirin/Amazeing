@@ -4,6 +4,7 @@ Play, and Solution Animation.
 """
 
 import time
+
 from typing import Any
 
 # ANSI terminal colors

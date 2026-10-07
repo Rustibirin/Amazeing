@@ -1,9 +1,12 @@
+"""Interactive WASD player navigation and game mode logic."""
+
 import sys
 import termios
 import tty
-from typing import Any
 import visualizer
 import subprocess
+
+from typing import Any
 
 
 def _get_key() -> str:

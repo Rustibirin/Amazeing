@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
+"""Main entry point for the A-Maze-ing maze generator and interactive menu."""
 
 import os
 import select
 import sys
 from time import sleep
-from typing import Any, NoReturn
+
 from pydantic import ValidationError
-import game_mode
-from generator import MazeGenerator
+
+import play_mode
 import visualizer
+from generator import MazeGenerator
 import parser as config_module
 from parser import Difficulty
+
+from typing import Any, NoReturn
 
 
 def flush_input() -> None:
@@ -151,7 +155,7 @@ def run_menu(
                     diff_val.name if hasattr(diff_val, 'name')
                     else str(diff_val).upper()
                 )
-                print(f"Game Mode: {diff_name}")
+                print(f"Difficulty: {diff_name}")
             print(f"Seed: {grid.maze.seed}")
 
         print("\n=== A-Maze-ing ===")
@@ -165,7 +169,7 @@ def run_menu(
         else:
             print("6. Toggle Difficulty")
         print("7. Toggle Algorithm")
-        print("8. Charge new settings")
+        print("8. Reload settings")
         print("9. PLAY MAZE!")
         print("10. Quit")
         print("\033[J")
@@ -262,7 +266,7 @@ def run_menu(
 
         elif choice == "9":
             if grid.maze:
-                game_mode.play_interactive(grid.maze)
+                play_mode.play_interactive(grid.maze)
 
         elif choice == "10":
             print("Goodbye!")

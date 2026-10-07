@@ -1,6 +1,5 @@
 """Reusable Maze Generator Module for external integration."""
 
-from typing import Any, Callable
 from pydantic import BaseModel, Field, PrivateAttr, model_validator
 
 from maze import Maze
@@ -8,6 +7,8 @@ from builder import Builder
 from solver import Solver
 from exporter import Exporter
 from parser import Difficulty
+
+from typing import Any, Callable
 
 
 class MazeGenerator(BaseModel):
