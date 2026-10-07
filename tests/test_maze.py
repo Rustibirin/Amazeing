@@ -133,3 +133,11 @@ def test_easter_egg_activation() -> None:
 
     # Verificamos que se han estampado los nombres
     assert maze.easter_egg is True
+
+
+def test_easter_egg_inactive_on_normal_grids(
+    default_settings: dict[str, object]
+) -> None:
+    """Test that easter egg is not activated on standard size grids."""
+    maze = Maze(default_settings)
+    assert getattr(maze, "easter_egg", False) is False

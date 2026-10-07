@@ -52,7 +52,6 @@ def play_interactive(maze: Any) -> None:
         print("\n=== Play Mode ===")
         print("Move: [W] Up | [S] Down | [A] Left | [D] Right")
         print("Quit: [Q] Return to main menu")
-        print("-----------------")
 
         if (current_x, current_y) == maze.exit:
             _play_sound()

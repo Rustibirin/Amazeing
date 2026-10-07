@@ -148,7 +148,6 @@ def run_menu(
                 print("You found the Easter Egg. Congratulations!!")
             print(f"Live Mode: {settings.get('LIVE_MODE', False)}")
             print(f"Perfect Mode: {settings['PERFECT']}")
-            print(f"Algorithm: {settings.get('ALGORITHM', 'WILSON')}")
             if not settings["PERFECT"]:
                 diff_val = settings.get('DIFFICULTY', Difficulty.BONUS)
                 diff_name = (
@@ -156,6 +155,7 @@ def run_menu(
                     else str(diff_val).upper()
                 )
                 print(f"Difficulty: {diff_name}")
+            print(f"Algorithm: {settings.get('ALGORITHM', 'WILSON')}")
             print(f"Seed: {grid.maze.seed}")
 
         print("\n=== A-Maze-ing ===")

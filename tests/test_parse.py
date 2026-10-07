@@ -166,3 +166,39 @@ def test_validate_config_invalid_difficulty() -> None:
     }
     with pytest.raises(ValidationError, match="Must be one of"):
         MazeGenerator(settings=invalid_difficulty)
+
+
+def test_parse_config_comments_and_empty_lines(tmp_path: Path) -> None:
+    """Test parsing config files containing comments and blank lines."""
+    config_file = tmp_path / "config_with_comments.txt"
+    config_file.write_text(
+        "# Configuration file comment\n"
+        "WIDTH=10\n"
+        "\n"
+        "# Another comment\n"
+        "HEIGHT=10\n"
+        "ENTRY=0,0\n"
+        "EXIT=9,9\n"
+        "OUTPUT_FILE=out.txt\n"
+        "PERFECT=True\n",
+        encoding="utf-8",
+    )
+
+    config = config_parser.parse_config(str(config_file))
+    assert config["WIDTH"] == 10
+    assert config["HEIGHT"] == 10
+    assert config["PERFECT"] is True
+
+
+def test_validate_config_exit_out_of_bounds() -> None:
+    """Test validation when exit coordinates are out of bounds."""
+    bad_exit = {
+        "WIDTH": 10,
+        "HEIGHT": 10,
+        "ENTRY": (0, 0),
+        "EXIT": (10, 10),
+        "OUTPUT_FILE": "out.txt",
+        "PERFECT": True,
+    }
+    with pytest.raises(ValidationError, match="is out of bounds"):
+        MazeGenerator(settings=bad_exit)

@@ -72,3 +72,14 @@ def test_exporter_empty_solution(
 
     lines = output_file.read_text(encoding="utf-8").splitlines()
     assert lines[6] == ""
+
+
+def test_exporter_trailing_newline(
+    maze_setup: Maze, tmp_path: Path
+) -> None:
+    """Test that the exported file ends with a trailing newline."""
+    output_file = tmp_path / "newline_test.txt"
+    Exporter.export(maze_setup, "EESS", str(output_file))
+
+    raw_text = output_file.read_text(encoding="utf-8")
+    assert raw_text.endswith("\n")

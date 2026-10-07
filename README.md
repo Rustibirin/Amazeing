@@ -97,9 +97,9 @@ Beyond the mandatory specifications, A-Maze-ing incorporates several advanced fe
 
 * **Interactive WASD Play Mode:** An interactive terminal game mode allowing players to manually walk through and solve the generated maze cell-by-cell using `W`, `A`, `S`, `D` keys with real-time TUI updates.
 
-* **Pac-Man Mode & Custom Difficulty Scaling:** When `PERFECT=False`, a post-processing algorithm opens all four corners/center and breaks dead-ends to guarantee multiple independent routes[cite: 37, 49]. Includes a dynamic `DIFFICULTY` system (`Easy` through `Insane`), featuring a special `Bonus` level that produces a fully `braided maze` (0 dead-ends).
+* **Pac-Man Mode & Custom Difficulty Scaling:** When `PERFECT=False`, a post-processing algorithm opens all four corners/center and breaks dead-ends to guarantee multiple independent routes. Includes a dynamic `DIFFICULTY` system (`Easy` through `Insane`), featuring a special `Bonus` level that produces a fully `braided maze` (0 dead-ends).
 
-* **Multi-Algorithm Engine:** Full support for both **Wilson's Algorithm** (unbiased uniform spanning trees) and **Depth-First Search (DFS)**, allowing users to compare different maze generation behaviors
+* **Multi-Algorithm Engine:** Full support for both **Wilson's Algorithm** (unbiased uniform spanning trees) and **Depth-First Search (DFS)**, allowing users to compare different maze generation behaviors.
 
 * **Real-Time Generation Animation:** Live terminal visualization of the maze generation process step-by-step with customizable frame `delays`.
 

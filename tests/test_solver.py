@@ -105,3 +105,35 @@ def test_solver_same_entry_and_exit() -> None:
 
     solution = solver.solve(maze)
     assert solution == ""
+
+
+def test_solver_path_validity_step_by_step(
+    small_maze_settings: dict[str, object]
+) -> None:
+    """
+    Test that the solution path physically
+    connects entry to exit without crossing walls.
+    """
+
+    maze = Maze(small_maze_settings)
+    maze.break_wall(0, 0, Maze.EAST, Maze.WEST, 1, 0)
+    maze.break_wall(1, 0, Maze.EAST, Maze.WEST, 2, 0)
+
+    solver = Solver()
+    path = solver.solve(maze)
+
+    curr_x, curr_y = maze.entry
+    dir_map = {
+        'N': (0, -1, Maze.NORTH),
+        'S': (0, 1, Maze.SOUTH),
+        'E': (1, 0, Maze.EAST),
+        'W': (-1, 0, Maze.WEST),
+    }
+
+    for step in path:
+        dx, dy, wall_flag = dir_map[step]
+        assert maze.has_wall(curr_x, curr_y, wall_flag) is False
+        curr_x += dx
+        curr_y += dy
+
+    assert (curr_x, curr_y) == maze.exit

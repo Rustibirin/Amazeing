@@ -1,6 +1,6 @@
 """
-Terminal ANSI Visualizer Module for Maze Generation,
-Play, and Solution Animation.
+Terminal ANSI Visualizer Module for Maze generation,
+play, and solution.
 """
 
 import time
