@@ -1,10 +1,12 @@
-*This project has been created as part of the 42 curriculum by <jruiz-ag & rumartin>*  <!-- markdownlint-disable-line -->
+*This project has been created as part of the 42 curriculum by jruiz-ag & rumartin*  <!-- markdownlint-disable-line -->
 
-# A-Maze-ing
+# A-MAZE-ING - @42Malaga <img align="right" src="https://img.shields.io/badge/Language-Python-blue?style=for-the-badge&logo=python" alt="Language Python"> <!-- markdownlint-disable MD033 -->
 
 ## Description
 
-A-Maze-ing is a robust and modular maze generator built in Python 3.10+. It is capable of generating both "perfect" mazes (a single valid path between two points) and "imperfect" playable boards (Pac-Man style with multiple loops and minimized dead-ends). The project features a custom bitwise matrix for optimized storage, a Breadth-First Search (BFS) pathfinding solver, real-time terminal rendering, and a fully decoupled architecture meant to be packaged and reused in future applications.
+This project is a feature-complete, highly modular maze generator and interactive terminal application built in Python 3.10+. It supports multiple generation algorithms to create both "perfect" mazes (a single unique path between entry and exit) and "imperfect" Pac-Man style boards featuring customizable difficulty levels.
+
+Beyond procedural generation, the project offers an **interactive Play Mode** that allows users to manually navigate and solve the maze directly in the terminal using standard WASD controls. Powered by a custom bitwise matrix for memory-efficient cell representation, A-Maze-ing includes automated Breadth-First Search (BFS) pathfinding, real-time generation animations, dynamic color customization, and embedded custom visual patterns ("42"). The core generation logic is strictly decoupled as a standalone reusable library (`mazegen`), fully prepared for pip packaging and distribution.
 
 ## Instructions
 
@@ -27,17 +29,34 @@ make run
 
 You can also run it manually passing a custom configuration file:
 
-```python
+```bash
 source .venv/bin/activate
-python3 a_maze_ing.py my_custom_config.txt
+python3 a_maze_ing.py custom_config.txt
 ```
 
 ### Development & Testing
 
-Run Linter (Flake8 & Mypy): make lint or make lint-strict
-Run Unit Tests (Pytest): make test
-Clean Cache & Build Files: make clean
-Full Cleanup (breaks venv): make fclean
+1. **Clean build files** <!-- markdownlint-disable-line -->
+
+To remove temporary files:
+
+```bash
+make clean
+# Or perform a complete cleanup:
+make fclean
+```
+
+2. **Test and Lint**  <!-- markdownlint-disable-line -->
+
+```bash
+make test
+```
+
+```bash
+make lint
+# Or strict static analysis:
+make lint-strict
+```
 
 ### Configuration file format
 
@@ -54,67 +73,131 @@ The program reads a plain text configuration file using a strict KEY=VALUE forma
 | `SEED` *(Optional)*       | Integer | Ensures deterministic procedural generation.                          | `SEED=42`              |
 | `DIFFICULTY` *(Optional)* | String  | Dead-end removal (`Bonus`, `Easy`, `Medium`, `Hard`, `Insane`).       | `DIFFICULTY=Easy`      |
 | `DELAY` *(Optional)*      | Float   | Delay in seconds for live terminal rendering.                         | `DELAY=0.05`           |
+| `ALGORITHM` *(Optional)*  | String  | Generation algorithm (`Wilson`, `DFS`).                               | `ALGORITHM=Wilson`     |
 
-### Maze Generation Algorithm
+### Maze Generation Algorithms
 
-We implemented Wilson's Algorithm for the core maze generation.
+We decided to implement and evaluate multiple graph-based procedural generation techniques to offer distinct maze structural behaviors:
 
-#### Why Wilson's?
+1. **Wilson's Algorithm (Default):**
 
-Many standard maze algorithms (like Recursive Backtracker or Prim's) introduce noticeable structural biases—such as excessively long straight corridors or a heavily radial layout. Wilson's algorithm generates an unbiased uniform spanning tree using loop-erased random walks. This means every possible perfect maze has an equal probability of being generated, resulting in highly unpredictable, complex, and aesthetically pleasing structures.
+Mechanism: Uses uniform loop-erased random walks to build a spanning tree.
+
+Why chosen: Standard algorithms like Recursive Backtracker or Prim's introduce structural biases (e.g., long straight corridors or radial patterns). Wilson's algorithm produces an unbiased uniform distribution over all possible spanning trees, resulting in highly unpredictable, complex, and aesthetically pleasing structures.
+
+2. **Depth-First Search Algorithm:** <!-- markdownlint-disable-line -->
+
+Mechanism: Traverses the grid deeply before backtracking, carving paths until dead ends are reached.
+
+Why chosen: Produces mazes with longer, windier paths and fewer short dead-ends compared to Wilson's, offering a noticeably different aesthetic and difficulty profile.
 
 ### Advanced Features
 
-Pac-Man Mode: When PERFECT=False, a post-processing algorithm traverses the perfect maze to tear down walls, open the four corners, and strategically break dead-ends based on the DIFFICULTY parameter, creating multiple independent routes.
+Beyond the mandatory specifications, A-Maze-ing incorporates several advanced features, official project bonuses, and terminal UX enhancements:
 
-Embedded Templates: The generator intelligently stamps a "42" shape in the center of the maze and includes hidden easter eggs for the developers if the dimensions allow it.
+* **Interactive WASD Play Mode:** An interactive terminal game mode allowing players to manually walk through and solve the generated maze cell-by-cell using `W`, `A`, `S`, `D` keys with real-time TUI updates.
+
+* **Pac-Man Mode & Custom Difficulty Scaling:** When `PERFECT=False`, a post-processing algorithm opens all four corners/center and breaks dead-ends to guarantee multiple independent routes[cite: 37, 49]. Includes a dynamic `DIFFICULTY` system (`Easy` through `Insane`), featuring a special `Bonus` level that produces a fully `braided maze` (0 dead-ends).
+
+* **Multi-Algorithm Engine:** Full support for both **Wilson's Algorithm** (unbiased uniform spanning trees) and **Depth-First Search (DFS)**, allowing users to compare different maze generation behaviors
+
+* **Real-Time Generation Animation:** Live terminal visualization of the maze generation process step-by-step with customizable frame `delays`.
+
+* **Dynamic Interactive TUI Dashboard:** A live menu interface to adjust generation settings on the fly without restarting the program (toggle algorithms, switch between Perfect/Pac-Man modes, tune difficulty, rotate color palettes, toggle animations, or reload `config.txt`).
+
+* **Embedded Templates & Easter Egg:** Intelligent center-stamping logic for the "42" pattern with bounds checking, along with a hidden embedded visual `easter egg`.
 
 ### Code Reusability (mazegen)
 
-The generation logic has been strictly decoupled from the CLI interface into a facade class called MazeGenerator. This module is designed to be distributed via pip (e.g., mazegen-1.0.0-py3-none-any.whl).
+The maze generation logic is completely decoupled from the CLI interface inside the `MazeGenerator` class. It can be built and distributed as a standalone wheel package `(mazegen-1.0.0-py3-none-any.whl)`.
 
 How to reuse it:
 
 ```python
+
 from generator import MazeGenerator
 
-# 1. Initialize with settings
+# 1. Configuration parameters
 settings = {
-    "WIDTH": 20, "HEIGHT": 20, "ENTRY": (0, 0), "EXIT": (19, 19),
-    "PERFECT": True, "SEED": 12345
+    "WIDTH": 20,
+    "HEIGHT": 20,
+    "ENTRY": (0, 0),
+    "EXIT": (19, 19),
+    "PERFECT": True,
+    "SEED": 12345,
+    "ALGORITHM": "WILSON"
 }
-generator = MazeGenerator(settings)
 
-# 2. Generate the maze object
-maze = generator.generate()
+# 2. Initiate and generate
+generator = MazeGenerator(settings=settings)
+maze, animated = generator.generate()
 
-# 3. Solve the maze and get the path (e.g., "NNEESSW")
+# 3. Access internal structure
+grid_matrix = maze.matrix
+has_north_wall = maze.has_wall(0, 0, maze.NORTH)
+
+# 4. Solve maze (returns path like "NNEESSW")
 solution = generator.solve()
 
-# 4. Export to the 42 subject format
-generator.export("my_maze_data.txt")
+# 5. Export to hexadecimal file format
+generator.export()
 ```
 
 Note: Refer to LICENSE.md (MIT) for redistribution rights.
 
-### Team and Project Management
+## Team and Project Management
 
-Jaime & Ruben: We adopted a pair-programming approach for the core algorithmic challenges (Bitwise logic, Wilson's implementation, and BFS solver) to ensure both members fully understood the mathematical operations.  
+`A-Maze-ing` was designed as a collaborative project, combining pair programming for key algorithmic challenges with specialized task distribution:
 
-Roles: Work was split dynamically. One focused on the parser, configuration validation, and unit testing (pytest suite), while the other developed the rendering engine and exporter.
+|   User   |                                        Files & Modules                                    |
+|----------|-------------------------------------------------------------------------------------------|
+| jruiz-ag | parser.py, builder.py, generator.py, tests/, Makefile, pyproject.toml                     |
+| rumartin | a_maze_ing.py, maze.py, solver.py, exporter.py, visualizer.py, play_mode.py, templates.py |
 
-Planning: We initially underestimated the complexity of the "Pac-Man" mode (removing dead-ends while maintaining valid states), which required us to refactor our wall-breaking logic mid-project.
+### Roles & Dynamics
 
-What worked well: Using bit masks (1, 2, 4, 8) to represent walls saved enormous amounts of memory and simplified the hex exporting process. Setting up the Makefile and pytest early caught numerous regressions.  Tools used: Git, GitHub, Python venv, Flake8, Mypy, Pytest.
+`jruiz-ag:` Focused on strict configuration parsing, Pydantic validations, pytest unit testing suite, and Python packaging configuration (setuptools/build)
 
-### Resources & AI Usage
+`rumartin:` Developed the bitwise matrix data structure, Wilson & DFS algorithms, BFS solver, interactive TUI menu, and ASCII visualizer.
 
-Graph Theory & Algorithms: Wikipedia articles on Maze generation algorithms (specifically Wilson's) and Breadth-first search.
+`Pair Programming:` Jointly tackled bitwise mask operations and dead-end removal logic for Pac-Man mode.
 
-AI Tools (LLMs): AI was used strictly as a thought partner and code-reviewer to adhere to the 42 AI guidelines. Specifically, it was used to:
+#### Planning evolution
+
+Initial Plan: Build a simple generator and CLI interface.
+
+Evolution: Mid-project, the complexity of opening loops for Pac-Man mode required refactoring wall-breaking methods to ensure shared walls between neighboring cells were updated atomically.
+
+#### What Worked Well
+
+Bitwise flags (1, 2, 4, 8) saved memory and simplified hexadecimal exporting.
+
+Setting up Makefile, flake8, mypy, and pytest early caught regressions instantly.
+
+#### What Could Be Improved
+
+TUI menu loop could be further refactored into smaller sub-modules.
+
+Automated terminal interaction testing could be expanded using terminal mocking.
+
+#### Tools Used
+
+Git, GitHub, Python venv, pip, flake8, mypy, pytest, Pydantic.
+
+## Resources
+
+**Graph Theory & Maze Algorithms:** Wikipedia articles on Maze generation algorithms (Wilson's Uniform Spanning Trees, DFS) and Breadth-First Search (BFS).
+
+**Python Packaging:** Official Python Packaging User Guide (build, setuptools).
+
+**Peer-to-Peer Learning:** Collaborative discussions with 42 peers regarding different points of view to structure and build the project.
+
+**AI usage:** AI was used strictly as a thought partner, code auditor, and learning assistant in full compliance with the 42 AI usage guidelines. To ensure effective interactions, structured **prompt engineering techniques** (such as role prompting, iterative refinement, and system constraint definitions) were applied to evaluate and validate output quality. Specifically, it was used to:
 
 1. Generate edge-case ideas for the pytest suite.
 
-2. Review and optimize the regex patterns in our parsing module.
+2. Audit our final codebase for PEP8/Flake8 compliance and catch missing English translations in our docstrings.
 
-3. Audit our final codebase for PEP8/Flake8 compliance and catch missing English translations in our docstrings. No direct code was copy-pasted without a full understanding and peer-review process.
+3. Formulate detailed, context-aware prompts to review architecture design options and debug complex algorithmic edge cases.
+
+*Note: No direct code was copy-pasted without a full understanding and peer-review process.*
