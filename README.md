@@ -119,28 +119,29 @@ from generator import MazeGenerator
 
 # 1. Configuration parameters
 settings = {
-    "WIDTH": 20,
-    "HEIGHT": 20,
+    "WIDTH": 15,
+    "HEIGHT": 10,
     "ENTRY": (0, 0),
-    "EXIT": (19, 19),
+    "EXIT": (14, 9),
     "PERFECT": True,
+    "OUTPUT_FILE": "test_maze.txt",
     "SEED": 12345,
     "ALGORITHM": "WILSON"
 }
 
-# 2. Initiate and generate
+# 2. Initiate and generate the maze
 generator = MazeGenerator(settings=settings)
-maze, animated = generator.generate()
+print("MazeGenerator successfully initialized!")
+maze, _ = generator.generate()
+print(f"Maze of {maze.width}x{maze.height} successfully generated!")
 
-# 3. Access internal structure
-grid_matrix = maze.matrix
-has_north_wall = maze.has_wall(0, 0, maze.NORTH)
-
-# 4. Solve maze (returns path like "NNEESSW")
+# 3. Find solution
 solution = generator.solve()
+print(f"Solution found! Steps: {solution}")
 
-# 5. Export to hexadecimal file format
+# 4. Export to hexadecimal file format
 generator.export()
+print(f"Maze successfully exported to {settings['OUTPUT_FILE']}!")
 ```
 
 Note: Refer to LICENSE.md (MIT) for redistribution rights.
