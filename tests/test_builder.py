@@ -1,8 +1,8 @@
 """Unit tests for the Builder module and maze generation logic."""
 
 import pytest
-from maze import Maze
-from builder import Builder
+from mazegen.maze import Maze
+from mazegen.builder import Builder
 
 
 @pytest.fixture

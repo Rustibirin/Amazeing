@@ -1,13 +1,13 @@
 """Reusable Maze Generator Module for external integration."""
 
-from typing import Any, Callable, Tuple
+from typing import Any, Callable
 from pydantic import BaseModel, Field, PrivateAttr, model_validator
 
-from maze import Maze
-from builder import Builder
-from solver import Solver
-from exporter import Exporter
-from parser import GameMode
+from mazegen.maze import Maze
+from mazegen.builder import Builder
+from mazegen.solver import Solver
+from mazegen.exporter import Exporter
+from mazegen.parser import GameMode
 
 
 class MazeGenerator(BaseModel):
@@ -106,11 +106,11 @@ class MazeGenerator(BaseModel):
         self,
         animation: Callable[[Any, float], None] | None = None,
         delay: float = 0.0,
-    ) -> Tuple[Maze, bool]:
+    ) -> Maze:
         """
         Generates the maze structure using the configured parameters.
         Returns:
-            Tuple[Maze, bool]: The constructed maze and animation status.
+            Maze: The constructed maze.
         """
 
         self._maze = Maze(self.settings)
@@ -129,7 +129,7 @@ class MazeGenerator(BaseModel):
         except KeyboardInterrupt:
             raise KeyboardInterrupt
 
-        return (self._maze, animation is not None)
+        return self._maze
 
     def solve(self) -> str:
         """

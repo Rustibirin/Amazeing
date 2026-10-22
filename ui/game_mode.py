@@ -1,9 +1,15 @@
+from pathlib import Path
+import subprocess
 import sys
 import termios
 import tty
 from typing import Any
-import visualizer
-import subprocess
+
+from ui import visualizer
+
+DEFAULT_SOUND = str(
+    Path(__file__).resolve().parent.parent / "assets" / "victory.wav"
+)
 
 
 def _get_key() -> str:
@@ -24,7 +30,7 @@ def _get_key() -> str:
     return key.lower()
 
 
-def _play_sound(file_path: str = "victory.wav") -> None:
+def _play_sound(file_path: str = DEFAULT_SOUND) -> None:
     """
     Plays a sound file.
     """

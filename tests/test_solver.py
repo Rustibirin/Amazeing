@@ -1,8 +1,8 @@
 """Unit tests for the Solver module and BFS pathfinding algorithm."""
 
 import pytest
-from maze import Maze
-from solver import Solver
+from mazegen.maze import Maze
+from mazegen.solver import Solver
 
 
 @pytest.fixture

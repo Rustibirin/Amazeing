@@ -1,6 +1,6 @@
 # Maze dimensions
-WIDTH=10
-HEIGHT=10
+WIDTH=6
+HEIGHT=6
 
 # Maze entry and exit coordinates
 ENTRY=0, 0

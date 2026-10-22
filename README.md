@@ -76,7 +76,7 @@ The generation logic has been strictly decoupled from the CLI interface into a f
 How to reuse it:
 
 ```python
-from generator import MazeGenerator
+from mazegen import MazeGenerator
 
 # 1. Initialize with settings
 settings = {

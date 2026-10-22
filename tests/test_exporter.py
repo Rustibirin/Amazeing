@@ -2,8 +2,8 @@
 
 from pathlib import Path
 import pytest
-from maze import Maze
-from exporter import Exporter
+from mazegen.maze import Maze
+from mazegen.exporter import Exporter
 
 
 @pytest.fixture

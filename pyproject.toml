@@ -7,7 +7,7 @@ name = "mazegen"
 version = "1.0.0"
 description = "A-Maze-ing maze generator module"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = {file = "LICENSE.md"}
 requires-python = ">=3.10"
 authors = [
     {name = "jruiz-ag"},
@@ -21,12 +21,4 @@ classifiers = [
 ]
 
 [tool.setuptools]
-py-modules = [
-    "generator",
-    "maze",
-    "builder",
-    "solver",
-    "exporter",
-    "templates",
-    "configuration",
-]
+packages = ["mazegen"]

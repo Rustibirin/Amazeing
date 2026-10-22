@@ -6,11 +6,9 @@ import sys
 from time import sleep
 from typing import Any
 from pydantic import ValidationError
-import game_mode
-from generator import MazeGenerator
-import visualizer
-import parser as config_module
-from parser import GameMode
+
+from mazegen import GameMode, MazeGenerator, parse_config
+from ui import game_mode, visualizer
 
 
 def flush_input() -> None:
@@ -226,7 +224,7 @@ def load_settings(config_path: str) -> dict[str, Any]:
     Charge the config parameters in a valid dictionary.
     """
 
-    settings = config_module.parse_config(config_path)
+    settings = parse_config(config_path)
     return settings
 
 

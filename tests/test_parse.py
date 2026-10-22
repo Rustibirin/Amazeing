@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import pytest
-import configuration  # type: ignore[import-not-found]
+from mazegen import parser as configuration
 
 
 def test_parse_config_valid(tmp_path: Path) -> None:
