@@ -1,7 +1,7 @@
 """Unit tests for the Maze model and bitwise matrix operations."""
 
 import pytest
-from maze import Maze
+from mazegen.maze import Maze
 from typing import Any
 
 

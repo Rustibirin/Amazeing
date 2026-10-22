@@ -2,11 +2,11 @@
 
 from pydantic import BaseModel, Field, PrivateAttr, model_validator
 
-from maze import Maze
-from builder import Builder
-from solver import Solver
-from exporter import Exporter
-from parser import Difficulty
+from mazegen.maze import Maze
+from mazegen.builder import Builder
+from mazegen.solver import Solver
+from mazegen.exporter import Exporter
+from mazegen.parser import Difficulty
 
 from typing import Any, Callable
 

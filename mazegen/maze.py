@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from templates import TEMPLATES
+from mazegen.templates import TEMPLATES
 
 
 class Maze:

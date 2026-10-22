@@ -38,7 +38,7 @@ debug: $(VENV)
 .PHONY: clean
 clean:
 	@echo "$(ORANGE)Cleaning cache files..."
-	@rm -rf __pycache__
+	@rm -rf __pycache__ */__pycache__ */*/__pycache__
 	@rm -rf .mypy_cache
 	@rm -rf .pytest_cache
 	@rm -rf *.egg-info

@@ -2,8 +2,8 @@
 
 from pathlib import Path
 import pytest
-from generator import MazeGenerator
-from maze import Maze
+from mazegen.generator import MazeGenerator
+from mazegen.maze import Maze
 from typing import Any
 
 

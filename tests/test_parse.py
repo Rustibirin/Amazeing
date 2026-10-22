@@ -3,8 +3,8 @@
 from pathlib import Path
 import pytest
 from pydantic import ValidationError
-import parser as config_parser
-from generator import MazeGenerator
+from mazegen import parser as config_parser
+from mazegen.generator import MazeGenerator
 
 
 def test_parse_config_valid(tmp_path: Path) -> None:

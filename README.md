@@ -115,7 +115,7 @@ How to reuse it:
 
 ```python
 
-from generator import MazeGenerator
+from mazegen import MazeGenerator
 
 # 1. Configuration parameters
 settings = {
@@ -152,8 +152,8 @@ Note: Refer to LICENSE.md (MIT) for redistribution rights.
 
 |   User   |                                        Files & Modules                                    |
 |----------|-------------------------------------------------------------------------------------------|
-| jruiz-ag | parser.py, builder.py, generator.py, tests/, Makefile, pyproject.toml                     |
-| rumartin | a_maze_ing.py, maze.py, solver.py, exporter.py, visualizer.py, play_mode.py, templates.py |
+| jruiz-ag | mazegen/ (parser.py, builder.py, generator.py), tests/, Makefile, pyproject.toml         |
+| rumartin | a_maze_ing.py, mazegen/ (maze.py, solver.py, exporter.py, templates.py), ui/, assets/    |
 
 ### Roles & Dynamics
 

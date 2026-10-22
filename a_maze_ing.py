@@ -8,11 +8,11 @@ from time import sleep
 
 from pydantic import ValidationError
 
-import play_mode
-import visualizer
-from generator import MazeGenerator
-import parser as config_module
-from parser import Difficulty
+from ui import play_mode
+from ui import visualizer
+from mazegen.generator import MazeGenerator
+from mazegen import parser as config_module
+from mazegen.parser import Difficulty
 
 from typing import Any, NoReturn
 
