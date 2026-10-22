@@ -307,21 +307,8 @@ def main() -> None:
     config_path: str = sys.argv[1]
 
     print("\033c", end="", flush=True)
-    print("Validating configuration...")
     try:
         settings = load_settings(config_path)
-
-        print()
-        print("Configuration loaded and validated successfully!")
-        print(f"Dimensions: {settings['WIDTH']}x{settings['HEIGHT']}")
-        print(f"Entry: {settings['ENTRY']} | Exit: {settings['EXIT']}")
-        print(f"Perfect Mode: {settings['PERFECT']}")
-        print(f"Output file: {settings['OUTPUT_FILE']}")
-        print(f"Seed: {settings['SEED']}")
-        flush_input()
-        input("\nPress Enter to continue...")
-        print("\033c", end="", flush=True)
-
         try:
             grid = MazeGenerator(settings=settings)
         except ValidationError as ex:
