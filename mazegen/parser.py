@@ -96,7 +96,7 @@ def parse_config(path: str) -> dict[str, Any]:
                     print(f"{text}: {e}", file=sys.stderr)
                     sys.exit(1)
         if ('SEED' not in config):
-            config['SEED'] = None
+            config['SEED'] = 42
         if ('DELAY' not in config):
             config['DELAY'] = 0.03
         if ('ALGORITHM' not in config):

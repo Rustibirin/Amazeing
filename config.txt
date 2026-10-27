@@ -13,7 +13,7 @@ OUTPUT_FILE=maze.txt
 PERFECT=false
 
 # Optionals
-SEED=55
-DIFFICULTY=hard
-DELAY=0.02
-ALGORITHM=wilson
+# SEED=55
+# DIFFICULTY=hard
+# DELAY=0.02
+# ALGORITHM=wilson
